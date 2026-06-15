@@ -1,0 +1,24 @@
+{
+  "skill": "boo-meta",
+  "should_trigger": [
+    "boo-meta I want dark mode shipped end to end",
+    "take this from idea to shipped",
+    "this repo is a mess, audit it and make it good",
+    "fix the flaky tests and then clean up the test helpers",
+    "which boo skills should handle this and in what order",
+    "investigate this bug and ship the fix",
+    "build the settings page and make sure it's actually good",
+    "run whatever skills this needs",
+    "boo-meta plan: migrate auth to OAuth",
+    "what's the boo flow for shipping dark mode, don't run it yet",
+    "map out the boo plan for cleaning up this repo"
+  ],
+  "near_miss": [
+    { "query": "review this diff", "expected": "boo-reviewing-code" },
+    { "query": "boo reviewing-code on feature/auth", "expected": "paseo-boo" },
+    { "query": "find a skill for kubernetes deploys", "expected": "find-skills" },
+    { "query": "refactor the parser module", "expected": "boo-refactoring-code" },
+    { "query": "why is this failing", "expected": "boo-investigating-failures" },
+    { "query": "map out this codebase", "expected": "boo-mapping-project-context" }
+  ]
+}

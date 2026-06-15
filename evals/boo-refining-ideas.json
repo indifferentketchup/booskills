@@ -1,0 +1,19 @@
+{
+  "skill": "boo-refining-ideas",
+  "should_trigger": [
+    "I want something that tracks my reading habits but I'm not sure what exactly",
+    "thinking about adding multiplayer, not sure how to approach it",
+    "not sure how to approach this feature",
+    "help me figure out what I actually want here",
+    "interview me about this idea",
+    "turn this rough idea into a requirements sketch"
+  ],
+  "near_miss": [
+    { "query": "plan this feature, requirements are in the ticket", "expected": "boo-planning-changes" },
+    { "query": "spec out the rate limiter", "expected": "boo-planning-changes" },
+    { "query": "research the best framework for this", "expected": "boo-researching" },
+    { "query": "build the landing page", "expected": "boo-building-ui" },
+    { "query": "implement change folder add-auth", "expected": "boo-implementing-changes" },
+    { "query": "map the codebase first", "expected": "boo-mapping-project-context" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "booskills",
+  "owner": {
+    "name": "Boo"
+  },
+  "metadata": {
+    "description": "BooSkills: agent-skill catalog with 16 skills and 12 agent personas for code review, investigation, architecture, planning, research, refactoring, UI building, frontend critique, and model routing."
+  },
+  "plugins": [
+    {
+      "name": "booskills",
+      "source": ".",
+      "description": "Agent-skill catalog with 16 skills and 12 agent personas for code review, investigation, architecture, planning, research, refactoring, UI building, frontend critique, and model routing.",
+      "version": "1.4.0"
+    }
+  ]
+}

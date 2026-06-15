@@ -1,0 +1,20 @@
+# Dependencies / build output
+node_modules/
+.next/
+out/
+dist/
+
+# Local tooling caches / session state (never ship)
+.aislop/
+.codesight/
+.idea/
+*.swp
+.DS_Store
+
+# Vendored upstream reference, not part of the catalog
+forks/
+
+# Backups and logs
+*.bak
+*.ui-bak
+*.log

@@ -1,0 +1,19 @@
+{
+  "skill": "boo-analyzing-architecture",
+  "should_trigger": [
+    "is this codebase well structured",
+    "should I split this module",
+    "review the layering of the api package",
+    "coupling and cohesion check on core/",
+    "is the dependency direction right here",
+    "evaluate the architecture of the worker subsystem"
+  ],
+  "near_miss": [
+    { "query": "map out the codebase", "expected": "boo-mapping-project-context" },
+    { "query": "review this diff", "expected": "boo-reviewing-code" },
+    { "query": "find slop and dead code", "expected": "boo-auditing-code-quality" },
+    { "query": "split the parser into two files for me", "expected": "boo-refactoring-code" },
+    { "query": "why is this endpoint slow and erroring", "expected": "boo-investigating-failures" },
+    { "query": "research microservices vs monolith for our case", "expected": "boo-researching" }
+  ]
+}

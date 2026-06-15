@@ -1,0 +1,19 @@
+{
+  "skill": "boo-researching",
+  "should_trigger": [
+    "research server-sent events vs websockets for us",
+    "compare drizzle and prisma",
+    "what's the current best way to do auth in a CLI app",
+    "evaluate whether temporal fits our stack",
+    "prior art check before we build this",
+    "look into how other teams solved multi-tenant rate limiting"
+  ],
+  "near_miss": [
+    { "query": "what is this project", "expected": "boo-mapping-project-context" },
+    { "query": "what does our auth module do", "expected": "boo-mapping-project-context" },
+    { "query": "why is this failing", "expected": "boo-investigating-failures" },
+    { "query": "is our architecture sound", "expected": "boo-analyzing-architecture" },
+    { "query": "review this diff", "expected": "boo-reviewing-code" },
+    { "query": "I have a vague idea for a feature, help me shape it", "expected": "boo-refining-ideas" }
+  ]
+}

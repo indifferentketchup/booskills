@@ -1,0 +1,102 @@
+/* Model-router Westie dark theme.
+   Scene: a developer at their desk, late evening, coding by the glow of a
+   single warm-bright monitor in a dim room. The tool is a precision instrument,
+   not a dashboard. The West Highland Terrier is compact, feisty, white-coated,
+   with a black button nose and dark eyes -- familiar, alert, warm against the
+   Highland night.
+   Strategy: committed dark-first. One accent (heather/thistle), one warm
+   off-white "coat" surface on a deep charcoal "ground." Per-provider hues are
+   data-viz justified (chips + score bars). OKLCH throughout.
+
+   Color roles:
+     --ground       deep Highland-night charcoal (body bg)
+     --coat         warm bright off-white (cards / elevated surfaces -- Westie fur)
+     --coat-2       slightly dimmed coat (nestled surfaces)
+     --nose         near-black (deep contrast accents / button-nose silhouette)
+     --ink          bright near-white (body text on ground, >=4.5:1)
+     --ink-soft     mid-gray (secondary text)
+     --ink-faint    dim gray (labels / tertiary, >=4.5:1 as required)
+     --line         dark border on ground
+     --line-strong  stronger border on ground
+     --heather      committed thistle-purple accent (the one Highland accent)
+     --heather-press pressed heather
+     --heather-wash heather wash on dark bg */
+
+:root {
+  --ground:       oklch(0.16 0.012 265);
+  --coat:         oklch(0.93 0.022 90);
+  --coat-2:       oklch(0.88 0.018 90);
+  --nose:         oklch(0.09 0.002 260);
+  --ink:          oklch(0.94 0 0);
+  --ink-soft:     oklch(0.66 0.004 265);
+  --ink-faint:    oklch(0.50 0.006 265);
+  --line:         oklch(0.25 0.008 265);
+  --line-strong:  oklch(0.35 0.008 265);
+  --heather:      oklch(0.62 0.18 310);
+  --heather-press: oklch(0.52 0.18 310);
+  --heather-wash: oklch(0.22 0.06 310);
+  --on-heather:   oklch(0.97 0 0);
+
+  --good:   oklch(0.62 0.16 150);
+  --warn:   oklch(0.68 0.16 75);
+  --bad:    oklch(0.62 0.20 27);
+  --bad-wash: oklch(0.22 0.06 27);
+
+  --p-digitalocean:  oklch(0.68 0.18 250);
+  --p-reasonix:      oklch(0.68 0.19 295);
+  --p-openrouter:    oklch(0.68 0.15 200);
+  --p-opencode-zen:  oklch(0.66 0.14 155);
+  --p-local:         oklch(0.66 0.12 130);
+  --p-local-edge:    oklch(0.66 0.10 110);
+  --p-opencode-go:   oklch(0.66 0.12 60);
+  --p-subscription:  oklch(0.64 0.04 70);
+
+  --radius:     10px;
+  --radius-sm:  7px;
+  --shadow:     0 1px 3px oklch(0 0 0 / 0.35), 0 8px 24px oklch(0 0 0 / 0.25);
+
+  --z-sticky:    100;
+  --z-dropdown:  200;
+  --z-toast:     400;
+
+  --font-ui:   ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, monospace;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { text-wrap: balance; letter-spacing: -0.02em; margin: 0; }
+p { text-wrap: pretty; }
+
+a { color: var(--heather); }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--heather);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+:focus:not(:focus-visible) { outline: none; }
+
+::placeholder { color: var(--ink-faint); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}

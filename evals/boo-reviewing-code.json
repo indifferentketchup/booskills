@@ -1,0 +1,23 @@
+{
+  "skill": "boo-reviewing-code",
+  "should_trigger": [
+    "look over my branch before I merge",
+    "is this diff safe to ship?",
+    "review PR #42",
+    "check the changes on feature/auth before merging",
+    "sanity check what I just wrote before I open the PR",
+    "give this changeset a verdict",
+    "review my staged changes",
+    "anything blocking in this diff?"
+  ],
+  "near_miss": [
+    { "query": "clean up this codebase", "expected": "boo-auditing-code-quality" },
+    { "query": "why is this test failing on my branch", "expected": "boo-investigating-failures" },
+    { "query": "review my UI", "expected": "boo-critiquing-frontend" },
+    { "query": "what needs refactoring in src/", "expected": "boo-auditing-code-quality" },
+    { "query": "refactor the parser module", "expected": "boo-refactoring-code" },
+    { "query": "is this codebase well structured", "expected": "boo-analyzing-architecture" },
+    { "query": "research the best code review automation tools", "expected": "boo-researching" },
+    { "query": "implement the change folder add-auth", "expected": "boo-implementing-changes" }
+  ]
+}
