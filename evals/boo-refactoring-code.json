@@ -1,0 +1,21 @@
+{
+  "skill": "boo-refactoring-code",
+  "should_trigger": [
+    "refactor the parser module",
+    "extract the validation logic into its own file",
+    "rename UserManager to UserService everywhere",
+    "dedupe these two near-identical helpers",
+    "apply backlog item 3 from the quality audit",
+    "inline this single-use wrapper",
+    "break this 800-line file into smaller modules",
+    "clean up this module without changing behavior"
+  ],
+  "near_miss": [
+    { "query": "what needs refactoring", "expected": "boo-auditing-code-quality" },
+    { "query": "find the slop in this repo", "expected": "boo-auditing-code-quality" },
+    { "query": "add retry logic to the http client", "expected": "boo-planning-changes" },
+    { "query": "this function returns the wrong value, figure out why", "expected": "boo-investigating-failures" },
+    { "query": "review my refactor branch", "expected": "boo-reviewing-code" },
+    { "query": "plan the migration to the new API", "expected": "boo-planning-changes" }
+  ]
+}

@@ -1,0 +1,21 @@
+# Run the model-router control UI in Docker.
+#   cd model-router && docker compose -f ui/docker-compose.yml up -d --build
+# Reachable at http://localhost:4319 (and over Tailscale at http://<this-host>:4319).
+#
+# The container bind-mounts your ~/.paseo read-write so the Playground reads the
+# live registry/presets and the editors persist to disk. It runs as uid 1000
+# (the node user); if your host user is not 1000:1000, set DOCKER_USER and
+# uncomment `user:` below so saved files stay owned by you.
+services:
+  model-router-ui:
+    build:
+      context: ..
+      dockerfile: ui/Dockerfile
+    image: model-router-ui
+    container_name: model-router-ui
+    # user: "${DOCKER_USER:-1000:1000}"
+    ports:
+      - "4319:4319"
+    volumes:
+      - "${PASEO_DIR:-${HOME}/.paseo}:/data/paseo"
+    restart: unless-stopped

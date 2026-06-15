@@ -1,0 +1,21 @@
+{
+  "skill": "boo-building-ui",
+  "should_trigger": [
+    "build a landing page for the product",
+    "add a settings screen",
+    "create a pricing table component",
+    "make the frontend for the dashboard",
+    "build the onboarding flow UI",
+    "add an empty state to the inbox view",
+    "implement this design mockup as components",
+    "build me a hero section that doesn't look AI-generated"
+  ],
+  "near_miss": [
+    { "query": "review my UI", "expected": "boo-critiquing-frontend" },
+    { "query": "does this screen look right", "expected": "boo-critiquing-frontend" },
+    { "query": "implement the change folder add-settings", "expected": "boo-implementing-changes" },
+    { "query": "why is the dropdown clipped behind the card", "expected": "boo-investigating-failures" },
+    { "query": "refactor the Button component internals", "expected": "boo-refactoring-code" },
+    { "query": "research the best component library for us", "expected": "boo-researching" }
+  ]
+}

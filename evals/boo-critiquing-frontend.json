@@ -1,0 +1,19 @@
+{
+  "skill": "boo-critiquing-frontend",
+  "should_trigger": [
+    "review my UI",
+    "does this screen look right?",
+    "critique the settings page design",
+    "is this component accessible",
+    "check the visual hierarchy on the landing page",
+    "grade my frontend against design standards"
+  ],
+  "near_miss": [
+    { "query": "build a landing page", "expected": "boo-building-ui" },
+    { "query": "make the frontend for the dashboard", "expected": "boo-building-ui" },
+    { "query": "review this backend diff", "expected": "boo-reviewing-code" },
+    { "query": "the modal won't open when I click the button", "expected": "boo-investigating-failures" },
+    { "query": "audit the whole codebase for slop", "expected": "boo-auditing-code-quality" },
+    { "query": "split this component into smaller ones", "expected": "boo-refactoring-code" }
+  ]
+}

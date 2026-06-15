@@ -1,0 +1,18 @@
+{
+  "skill": "paseo-boo",
+  "should_trigger": [
+    "boo reviewing-code on feature/auth",
+    "/paseo-boo research websocket libraries",
+    "fan this audit out to a paseo agent",
+    "run the review as a paseo agent",
+    "dispatch boo-mapping-project-context for ~/proj/foo",
+    "boo build the landing page"
+  ],
+  "near_miss": [
+    { "query": "review this diff", "expected": "boo-reviewing-code" },
+    { "query": "refine my idea with me", "expected": "boo-refining-ideas" },
+    { "query": "switch the paseo preset to econo", "expected": "paseo-preset (external skill)" },
+    { "query": "create a paseo worktree for this branch", "expected": "paseo (external skill)" },
+    { "query": "run the tests", "expected": null }
+  ]
+}

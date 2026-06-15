@@ -1,0 +1,21 @@
+{
+  "skill": "boo-investigating-failures",
+  "should_trigger": [
+    "why is this failing",
+    "this worked yesterday and now it doesn't",
+    "here's the stack trace, what's going on",
+    "the login endpoint 500s intermittently",
+    "tests are flaky on CI",
+    "why does the dropdown render blank in production",
+    "the worker silently stops processing jobs",
+    "figure out what broke after the last deploy"
+  ],
+  "near_miss": [
+    { "query": "is this diff safe to ship", "expected": "boo-reviewing-code" },
+    { "query": "what is this project", "expected": "boo-mapping-project-context" },
+    { "query": "find the slop in this repo", "expected": "boo-auditing-code-quality" },
+    { "query": "refactor this so it stops being confusing", "expected": "boo-refactoring-code" },
+    { "query": "research why people moved off that library", "expected": "boo-researching" },
+    { "query": "spec out the fix for the bug we diagnosed", "expected": "boo-planning-changes" }
+  ]
+}

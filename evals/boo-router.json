@@ -1,0 +1,18 @@
+{
+  "skill": "boo-router",
+  "should_trigger": [
+    "which model should I use for the audit role",
+    "route this implementation task to the best provider",
+    "/boo-router impl apply a mechanical refactor across files",
+    "pick the model for a screenshot-heavy ui review",
+    "resolve the best provider before I create the agent",
+    "what provider for a 1M-token research task on this preset"
+  ],
+  "near_miss": [
+    { "query": "dispatch boo-reviewing-code as a paseo agent", "expected": "paseo-boo" },
+    { "query": "take this from idea to shipped", "expected": "boo-meta" },
+    { "query": "switch the preset to grade-S", "expected": "paseo-preset (external skill)" },
+    { "query": "review this diff for bugs", "expected": "boo-reviewing-code" },
+    { "query": "run the tests", "expected": null }
+  ]
+}

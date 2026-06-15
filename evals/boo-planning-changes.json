@@ -1,0 +1,19 @@
+{
+  "skill": "boo-planning-changes",
+  "should_trigger": [
+    "plan this feature",
+    "spec out the rate limiter",
+    "create a change folder for the auth migration",
+    "turn this requirements sketch into a plan",
+    "make the openspec proposal for offline mode",
+    "break this work into verifiable tasks"
+  ],
+  "near_miss": [
+    { "query": "I have a fuzzy idea about gamification", "expected": "boo-refining-ideas" },
+    { "query": "implement the change add-auth", "expected": "boo-implementing-changes" },
+    { "query": "refactor this module", "expected": "boo-refactoring-code" },
+    { "query": "research approaches before we commit", "expected": "boo-researching" },
+    { "query": "review the diff on my plan branch", "expected": "boo-reviewing-code" },
+    { "query": "what needs refactoring around here", "expected": "boo-auditing-code-quality" }
+  ]
+}

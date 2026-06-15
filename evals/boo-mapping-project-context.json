@@ -1,0 +1,19 @@
+{
+  "skill": "boo-mapping-project-context",
+  "should_trigger": [
+    "what is this project",
+    "map out the codebase",
+    "onboard me into this repo",
+    "refresh CONTEXT.md",
+    "what are the entry points and services here",
+    "do pre-work recon before we plan the feature"
+  ],
+  "near_miss": [
+    { "query": "is this codebase well structured", "expected": "boo-analyzing-architecture" },
+    { "query": "should I split this module", "expected": "boo-analyzing-architecture" },
+    { "query": "why is this failing", "expected": "boo-investigating-failures" },
+    { "query": "research the current best way to do sse in node", "expected": "boo-researching" },
+    { "query": "find dead code in the repo", "expected": "boo-auditing-code-quality" },
+    { "query": "review this diff", "expected": "boo-reviewing-code" }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "skill": "boo-validating-changes",
+  "should_trigger": [
+    "validate this plan before we build it",
+    "is the add-auth change folder ready to implement",
+    "verify the implementation matches the spec",
+    "check that rate-limiter was built right",
+    "adversarially review the openspec plan",
+    "did the implementation actually do everything tasks.md claims",
+    "boo validate add-auth",
+    "trace the diff back to the specs"
+  ],
+  "near_miss": [
+    { "query": "review this diff before merge", "expected": "boo-reviewing-code" },
+    { "query": "plan this feature", "expected": "boo-planning-changes" },
+    { "query": "implement the change folder add-auth", "expected": "boo-implementing-changes" },
+    { "query": "why is the implemented feature failing at runtime", "expected": "boo-investigating-failures" },
+    { "query": "archive the completed change", "expected": "openspec-archive-change (external skill)" },
+    { "query": "stress-test my plan by interviewing me", "expected": "grill-me / boo-refining-ideas (interactive)" }
+  ]
+}

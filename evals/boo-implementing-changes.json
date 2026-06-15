@@ -1,0 +1,19 @@
+{
+  "skill": "boo-implementing-changes",
+  "should_trigger": [
+    "implement add-auth",
+    "apply the change folder",
+    "continue the implementation of rate-limiter",
+    "work through the tasks in openspec/changes/rate-limiter",
+    "build it (the validated change folder from yesterday)",
+    "execute the plan task by task"
+  ],
+  "near_miss": [
+    { "query": "plan this feature first", "expected": "boo-planning-changes" },
+    { "query": "this is broken, figure out why before we build", "expected": "boo-investigating-failures" },
+    { "query": "refactor the helper module", "expected": "boo-refactoring-code" },
+    { "query": "build a settings screen", "expected": "boo-building-ui" },
+    { "query": "review what I implemented", "expected": "boo-reviewing-code" },
+    { "query": "I have an idea but no requirements yet", "expected": "boo-refining-ideas" }
+  ]
+}

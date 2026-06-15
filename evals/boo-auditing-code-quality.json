@@ -1,0 +1,21 @@
+{
+  "skill": "boo-auditing-code-quality",
+  "should_trigger": [
+    "find the slop in this repo",
+    "clean up this codebase",
+    "what needs refactoring here?",
+    "do a post-vibe-coding cleanup pass",
+    "code health check on the api module",
+    "how much dead code do we have",
+    "score this repo against quality standards",
+    "find over-abstraction and duplication in src/"
+  ],
+  "near_miss": [
+    { "query": "review this diff before merge", "expected": "boo-reviewing-code" },
+    { "query": "extract the validation logic into its own file", "expected": "boo-refactoring-code" },
+    { "query": "refactor the parser to use the visitor pattern", "expected": "boo-refactoring-code" },
+    { "query": "why does the build fail", "expected": "boo-investigating-failures" },
+    { "query": "is the module structure sound", "expected": "boo-analyzing-architecture" },
+    { "query": "map out this codebase", "expected": "boo-mapping-project-context" }
+  ]
+}
