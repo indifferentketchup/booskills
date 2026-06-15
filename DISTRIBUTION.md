@@ -9,24 +9,18 @@ personas into each agent's directories. No npm, no marketplace, no skills.sh.
 | Linux / macOS | `bash scripts/install.sh` | symlinks (live; re-run only on new skills) |
 | Windows | `pwsh scripts/install.ps1` | copies (re-run after every pull) |
 
-## One-time: publish from this machine (Linux)
+## Remote
 
-The repo has no remote yet. Create a **private** remote and push (you commit and
-push manually; agents never do).
+Published as the **private** repo `indifferentketchup/booskills` (default branch
+`main`). Personal: a private repo for syncing your own machines, not a public
+registry. Push further work the usual way:
 
 ```bash
 cd /home/samkintop/opt/booskills
-git status                      # review what you are about to commit
 git add <paths>                 # stage by concern; do not use git add -A
-git commit -m "booskills catalog"
-# private remote (pick one):
-gh repo create booskills --private --source=. --remote=origin   # GitHub private
-# or:  git remote add origin git@host:you/booskills.git
-git push -u origin master
+git commit -m "..."
+git push                        # origin/main
 ```
-
-This stays local-only in spirit: a private repo for syncing your own machines, not
-a public registry.
 
 ## On Windows: first install
 
@@ -34,7 +28,7 @@ Prerequisites: Git and PowerShell 5+ (or `pwsh` 7+). Node.js only if you want th
 `boo-router` script to run.
 
 ```powershell
-git clone <your-private-remote-url> $HOME\opt\booskills
+gh repo clone indifferentketchup/booskills $HOME\opt\booskills   # or: git clone git@github.com:indifferentketchup/booskills.git
 cd $HOME\opt\booskills
 # if PowerShell blocks the script:
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
