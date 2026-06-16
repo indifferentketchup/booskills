@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import * as ledger from "./load-ledger.mjs";
 
 const DEFAULT_MODEL_TIERS = "~/.paseo/model-tiers.json";
@@ -75,6 +76,7 @@ function parseArgs(argv) {
     else if (arg === "--tokens") args.tokens = Number(next() || 0);
     else if (arg === "--no-ledger") args.noLedger = true;
     else if (arg === "--load-snapshot") args.loadSnapshot = true;
+    else if (arg === "--live-status") args.liveStatus = next() || "";
     else if (arg === "--help" || arg === "-h") args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -457,15 +459,39 @@ Options:
   --release <id>           Mark dispatch <id> complete; no routing performed
   --tokens <n>             Optional token spend recorded with --reserve/--release
   --no-ledger              Ignore the shared load ledger (stateless routing)
+  --live-status <url>      Query <url> for running models to auto-populate --resident-local
   --json                   Print JSON
   --explain                Print full per-candidate scoring trace
   --dry-run-samples        Run sample selections
 `);
 }
 
+// Query GET /api/providers and return the first loaded local model name.
+// Uses execFileSync+curl with args as array (no shell, no injection risk).
+function resolveLiveStatus(statusUrl) {
+  try {
+    const raw = execFileSync("curl", ["-s", "--max-time", "3", statusUrl], { timeout: 4000, encoding: "utf8" });
+    const data = JSON.parse(raw);
+    for (const p of data.providers ?? []) {
+      if (!p.ok || !p.models?.length) continue;
+      const m = p.models[0];
+      return typeof m === "string" ? m : (m.id || m.model || "");
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
 function runOne(args) {
   const registry = readJson(args.modelTiersPath);
   const preset = readJson(args.presetPath);
+
+  let residentLocal = args.residentLocal;
+  if (!residentLocal && args.liveStatus) {
+    residentLocal = resolveLiveStatus(args.liveStatus);
+  }
+
   const request = {
     role: args.role,
     task: args.task,
@@ -475,7 +501,7 @@ function runOne(args) {
     priority: args.priority || BUDGET_TO_PRIORITY[args.budget] || "balanced",
     fanout: args.fanout,
     requires: args.requires,
-    residentLocal: args.residentLocal,
+    residentLocal,
     noLedger: args.noLedger,
   };
   const result = chooseProvider(request, preset, registry);
