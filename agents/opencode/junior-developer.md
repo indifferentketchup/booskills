@@ -304,7 +304,7 @@ Default filename: `junior-dev-review.md`. Use the user-specified path if provide
 
 ### Returned Summary
 
-Return this to the caller. Identical text appears in the Summary section of the full review:
+Return this to the caller as plain markdown — do NOT wrap it in a fenced code block. Identical text appears in the Summary section of the full review:
 
 ```
 ## Summary
