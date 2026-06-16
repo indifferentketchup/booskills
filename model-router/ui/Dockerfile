@@ -21,6 +21,7 @@ ENV NODE_ENV=production \
 WORKDIR /app/ui
 COPY --from=build --chown=node:node /app/ui ./
 COPY --chown=node:node router.mjs /app/router.mjs
+COPY --chown=node:node load-ledger.mjs /app/load-ledger.mjs
 USER node
 EXPOSE 4319
 CMD ["npm", "run", "start"]
