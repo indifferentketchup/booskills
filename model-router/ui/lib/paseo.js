@@ -6,6 +6,9 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 
+// llama-swap base URL — override via env when running in Docker or on a non-default port.
+export const LLAMA_SWAP_URL = process.env.LLAMA_SWAP_URL || "http://localhost:8080";
+
 const execFileAsync = promisify(execFile);
 
 const REPO_MODEL_ROUTER = path.resolve(process.cwd(), "..");
@@ -67,6 +70,30 @@ export async function renamePreset(oldName, newName) {
   await deletePreset(oldName);
 }
 
+// Poll llama-swap for health and the currently loaded model. Times out at 3 s so a
+// downed local server never stalls the dashboard. Returns { ok, latencyMs, models }.
+export async function checkLocalProvider() {
+  const start = Date.now();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 3000);
+  try {
+    const [health, running] = await Promise.allSettled([
+      fetch(`${LLAMA_SWAP_URL}/health`, { signal: controller.signal }),
+      fetch(`${LLAMA_SWAP_URL}/running`, { signal: controller.signal }),
+    ]);
+    clearTimeout(timer);
+    const ok = health.status === "fulfilled" && health.value.ok;
+    let models = [];
+    if (running.status === "fulfilled" && running.value.ok) {
+      try { models = await running.value.json(); } catch { /* ignore parse error */ }
+    }
+    return { src: "local", ok, latencyMs: Date.now() - start, models: Array.isArray(models) ? models : [] };
+  } catch {
+    clearTimeout(timer);
+    return { src: "local", ok: false, latencyMs: Date.now() - start, models: [] };
+  }
+}
+
 // Read-only load snapshot for the dashboard. Shells out to the router the same way
 // runRouter does (avoids bundling the router's ledger module into Next), then shapes
 // the raw snapshot with the registry's quotas. A missing ledger reports zero load.
@@ -79,12 +106,12 @@ export async function readLoad() {
   const softCap = (src) => softCaps[src] ?? softCaps._default ?? 4;
 
   const sources = Object.entries(snap.bySrc || {})
-    .map(([src, v]) => ({ src, inflight: v.inflight, usage: v.usage, softCap: softCap(src) }))
+    .map(([src, v]) => ({ src, inflight: v.inflight, usage: v.usage, tokens: v.tokens || 0, softCap: softCap(src) }))
     .sort((a, b) => b.inflight - a.inflight || b.usage - a.usage);
   const models = Object.entries(snap.byKey || {})
     .map(([key, v]) => {
       const quota = Number(quotas[key] ?? 0);
-      return { key, inflight: v.inflight, usage: v.usage, quota, remaining: quota ? Math.max(0, quota - v.usage) : null };
+      return { key, inflight: v.inflight, usage: v.usage, tokens: v.tokens || 0, quota, remaining: quota ? Math.max(0, quota - v.usage) : null };
     })
     .sort((a, b) => b.inflight - a.inflight || b.usage - a.usage);
 
