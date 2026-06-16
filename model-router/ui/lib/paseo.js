@@ -70,6 +70,41 @@ export async function renamePreset(oldName, newName) {
   await deletePreset(oldName);
 }
 
+const OR_KEY_PATH = path.join(PASEO_DIR, "openrouter-key");
+const OR_BASE = process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1";
+
+// Read the OpenRouter management key from ~/.paseo/openrouter-key (null if absent).
+async function readOrKey() {
+  try { return (await fs.readFile(OR_KEY_PATH, "utf8")).trim(); } catch { return null; }
+}
+
+// Fetch OpenRouter account credits and per-key daily usage. Returns { ok, credits, keyInfo }.
+export async function checkOpenRouter() {
+  const key = await readOrKey();
+  if (!key) return { src: "openrouter", ok: false, reason: "no key configured" };
+  const start = Date.now();
+  const headers = { Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+  try {
+    const [cr, ki] = await Promise.allSettled([
+      fetch(`${OR_BASE}/credits`, { headers }),
+      fetch(`${OR_BASE}/key`, { headers }),
+    ]);
+    const credits = cr.status === "fulfilled" && cr.value.ok ? (await cr.value.json()).data : null;
+    const keyInfo = ki.status === "fulfilled" && ki.value.ok ? (await ki.value.json()).data : null;
+    return {
+      src: "openrouter",
+      ok: !!(credits || keyInfo),
+      latencyMs: Date.now() - start,
+      balance: credits ? credits.total_credits - credits.total_usage : null,
+      usageToday: keyInfo?.usage_daily ?? null,
+      usageMonth: keyInfo?.usage_monthly ?? null,
+      limitRemaining: keyInfo?.limit_remaining ?? null,
+    };
+  } catch (err) {
+    return { src: "openrouter", ok: false, latencyMs: Date.now() - start, reason: String(err.message) };
+  }
+}
+
 // Poll llama-swap for health and the currently loaded model. Times out at 3 s so a
 // downed local server never stalls the dashboard. Returns { ok, latencyMs, models }.
 export async function checkLocalProvider() {
