@@ -66,6 +66,10 @@ export default function StyleBlock() {
       @keyframes spin { to { transform: rotate(360deg); } }
       @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--heather); } }
 
+      /* Load tab: refresh pulse */
+      .refresh-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); transition: background 0.3s ease; }
+      .refresh-dot.on { background: var(--p-opencode-zen); box-shadow: 0 0 8px var(--p-opencode-zen); }
+
       /* Playground result */
       .result { min-height: 320px; }
       .pick { border: 1px solid oklch(0.72 0.015 90); border-radius: var(--radius); padding: 16px; background: var(--coat-2); }

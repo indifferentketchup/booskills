@@ -13,7 +13,7 @@ description: >
   boo-refining-ideas, which is interactive and runs inline. Do NOT use for
   multi-skill pipelines from one goal; use boo-meta.
 metadata:
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Paseo-Boo Router
@@ -44,7 +44,12 @@ Pass-through. If the operator gives a size ($size or words like "large review"),
    - The operator's task statement and any $size override.
    - The standing rules: never commit, never push, never `git add -A`; prove edits with `git diff --stat`; no em dashes in outputs.
    - Weave in any `preferences` strings from orchestration-preferences.json that apply to the role.
-6. Launch as an **attached subagent** with the Paseo MCP `create_agent` tool so the agent appears in your subagent track. The `paseo run` CLI cannot create a tracked subagent; use the MCP tool. Pass:
+6. Resolve the provider and reserve the load slot in one call. Generate a short dispatch id (for example `boo-<role>-<epoch>`). Run the router so it picks the provider AND records the pick as in-flight, so a concurrent sibling dispatch sees the load and spreads off a crowded provider:
+   ```
+   node ~/.agents/skills/boo-router/scripts/router.mjs --role <role> --task "<task>" \
+     --preset ~/.paseo/orchestration-preferences.json --reserve <dispatchId> --json
+   ```
+   Read `result.provider` and keep `<dispatchId>` for the release at closure. Reserve at route time, before `create_agent`, so the slot is visible to siblings the instant it is taken. This applies to pinned roles too (the router returns the pinned string and still records the dispatch), so every fan-out feeds the shared load ledger, not just array-pool roles. Then launch as an **attached subagent** with the Paseo MCP `create_agent` tool so the agent appears in your subagent track. The `paseo run` CLI cannot create a tracked subagent; use the MCP tool. Pass:
    - `title`: "<skill>: <short task>"
    - `provider`: the resolved provider string (for example `claude/opus`)
    - `cwd`: the target dir
@@ -55,7 +60,7 @@ Pass-through. If the operator gives a size ($size or words like "large review"),
    Capture the returned `agentId`. If the Paseo MCP tools (`mcp__paseo__*`) are not available in this session (you were not launched by Paseo, e.g. a plain CLI), do not use `create_agent`; follow the CLI fallback below instead.
 7. Supervise on the finish notification only. Because the agent runs with `notifyOnFinish: true`, do NOT call `wait_for_agent` and do NOT poll `get_agent_status` or `list_agents` to check on it (paseo skill rule); move on and let the notification arrive. The notification also fires on errors and permission requests. Two distinct permission layers: OpenCode tool-permission prompts (edit/run inside the worker) are auto-accepted by the `auto_accept` feature set at dispatch and never reach you; Paseo access requests (for example `external_directory` outside the cwd) still surface here. For the latter, read it with `list_pending_permissions` and approve with `respond_to_permission` only for read-only directory scopes inside the target repo or its named reference paths; surface everything else to the operator.
 8. Retrieval: when the finish notification arrives, read the agent's report with `get_agent_activity` (a one-time read after finish, not a poll), and verify any artifact it claims to have written actually exists.
-9. Closure: relay the outcome with the agent id, then `archive_agent` the subagent once its report is relayed and artifacts verified. Skip the archive only when the operator wants follow-ups on the same agent (a persistent dispatch); otherwise an attached subagent left open just archives with you later. Never archive an agent whose report you have not yet read.
+9. Closure: relay the outcome with the agent id, then `archive_agent` the subagent once its report is relayed and artifacts verified. Skip the archive only when the operator wants follow-ups on the same agent (a persistent dispatch); otherwise an attached subagent left open just archives with you later. Never archive an agent whose report you have not yet read. Release the load slot so the provider stops counting as in-flight: `node ~/.agents/skills/boo-router/scripts/router.mjs --release <dispatchId>`. Always release, including on a failed or errored dispatch, so a dead agent never holds a slot; the ledger also TTL-expires a reservation after 30 minutes as a backstop.
 
 ## CLI fallback (no Paseo MCP tools)
 
@@ -64,7 +69,7 @@ Use this only when `mcp__paseo__*` is absent (a session not launched by Paseo, s
 - Dispatch detached so you do not block: `paseo run -d --json --title "<skill>: <short task>" --provider <provider> --cwd <dir> "<prompt>"`. For an OpenCode-family provider, add `--mode full-access` so the worker auto-accepts OpenCode tool-permission prompts instead of stalling. Capture `agentId` from the JSON on stdout. (Never run without `-d`: foreground `paseo run` blocks for the whole 10-30 min run.)
 - Supervise: a single background `paseo wait <agentId> --timeout <duration>`, never a foreground poll loop. Handle permission requests with `paseo permit` by the same read-only-scope rule as step 7.
 - Retrieve: `paseo logs <agentId>`; verify any claimed artifact exists.
-- Close: `paseo archive <agentId>` after relaying. A CLI-dispatched agent is detached and is NOT archived with you, so the explicit archive is required, not optional.
+- Close: `paseo archive <agentId>` after relaying, then release the load slot: `node ~/.agents/skills/boo-router/scripts/router.mjs --release <dispatchId>`. A CLI-dispatched agent is detached and is NOT archived with you, so both the explicit archive and the release are required, not optional.
 - In your output, say `CLI fallback: detached agent, no subagent track`.
 
 ## Composition rules
@@ -91,6 +96,7 @@ Use this only when `mcp__paseo__*` is absent (a session not launched by Paseo, s
 - On the CLI fallback, `paseo wait` takes `--timeout <duration>`; `--wait-timeout` belongs to `paseo run` only. Capture `agentId` from `paseo run -d --json` stdout.
 - Each skill is symlinked flat at `~/.agents/skills/<skill-name>` pointing at the repo's `skills/<skill-name>/` directory; the dispatched agent reads skills by path, so platform skill discovery is not required for routed dispatches.
 - The preferences file also carries freeform `preferences` strings (commit policy, scope posture); they are operator law and go into every dispatch prompt.
+- Load awareness lives in the shared ledger `~/.paseo/router-load.jsonl`. `--reserve` at route time and `--release` at closure are a matched pair keyed by the same dispatch id; a missing release leaks a slot until the 30 minute TTL reclaims it. The router only reads the ledger to spread load and respect per-provider 5h quotas; it never blocks a dispatch, so a stale ledger degrades to slightly stale load estimates, never a stall.
 <!-- standing-rules:core:start -->
 - **No commit**: never commit, push, or stage changes; never `git add -A`. Prove any edits with `git diff --stat`.
 - **No em dashes**: never use em dashes (U+2014) in output or files you write.

@@ -31,7 +31,9 @@ export async function listPresets() {
 }
 
 function presetPath(name) {
-  return path.join(PRESETS_DIR, `${name}.json`);
+  const resolved = path.join(PRESETS_DIR, `${name}.json`);
+  if (!resolved.startsWith(PRESETS_DIR + path.sep)) throw new Error("path traversal rejected");
+  return resolved;
 }
 
 export async function readPreset(name) {
@@ -63,6 +65,37 @@ export async function renamePreset(oldName, newName) {
   obj.preset = newName;
   await writePreset(newName, obj);
   await deletePreset(oldName);
+}
+
+// Read-only load snapshot for the dashboard. Shells out to the router the same way
+// runRouter does (avoids bundling the router's ledger module into Next), then shapes
+// the raw snapshot with the registry's quotas. A missing ledger reports zero load.
+export async function readLoad() {
+  const { stdout } = await execFileAsync("node", [ROUTER_PATH, "--load-snapshot", "--model-tiers", REGISTRY_PATH], { timeout: 15000 });
+  const snap = JSON.parse(stdout);
+  const registry = await readRegistry();
+  const quotas = registry.quotas_per_5h || {};
+  const softCaps = snap.tuning?.concurrency_soft || {};
+  const softCap = (src) => softCaps[src] ?? softCaps._default ?? 4;
+
+  const sources = Object.entries(snap.bySrc || {})
+    .map(([src, v]) => ({ src, inflight: v.inflight, usage: v.usage, softCap: softCap(src) }))
+    .sort((a, b) => b.inflight - a.inflight || b.usage - a.usage);
+  const models = Object.entries(snap.byKey || {})
+    .map(([key, v]) => {
+      const quota = Number(quotas[key] ?? 0);
+      return { key, inflight: v.inflight, usage: v.usage, quota, remaining: quota ? Math.max(0, quota - v.usage) : null };
+    })
+    .sort((a, b) => b.inflight - a.inflight || b.usage - a.usage);
+
+  return {
+    now: snap.now,
+    host: snap.host || {},
+    windowSec: snap.tuning?.window_sec ?? 5 * 3600,
+    sources,
+    models,
+    totalInflight: sources.reduce((sum, s) => sum + s.inflight, 0),
+  };
 }
 
 export async function runRouter(req) {

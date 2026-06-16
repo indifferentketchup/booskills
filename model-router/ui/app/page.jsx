@@ -42,6 +42,7 @@ export default function Page() {
 
   const tabs = [
     { id: "playground", label: "Playground" },
+    { id: "load", label: "Load" },
     { id: "priority", label: "Provider priority" },
     { id: "presets", label: "Presets" },
   ];
@@ -63,6 +64,7 @@ export default function Page() {
       {optsError && <div className="panel error" role="alert">Could not load options: {optsError}. Is the router/registry present at ~/.paseo?</div>}
 
       {tab === "playground" && <Playground opts={opts} />}
+      {tab === "load" && <Load />}
       {tab === "priority" && <Priority opts={opts} />}
       {tab === "presets" && <Presets opts={opts} />}
 
@@ -171,6 +173,122 @@ function Playground({ opts }) {
               </ul>
             </div>
           </>
+        )}
+      </section>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Load tab                                                           */
+/* ------------------------------------------------------------------ */
+function pct(n) { return `${Math.round((n || 0) * 100)}%`; }
+
+function LoadBar({ value, max, over, src }) {
+  const ratio = max > 0 ? value / max : 0;
+  const width = Math.max(2, Math.min(ratio, 1) * 100);
+  const background = over ? "var(--bad)" : src ? `var(--p-${src})` : "var(--heather)";
+  return <div className="bar"><span style={{ width: `${width}%`, background }} /></div>;
+}
+
+function Load() {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [auto, setAuto] = useState(true);
+  const [pulse, setPulse] = useState(false);
+
+  const refresh = useCallback(async () => {
+    try {
+      const r = await fetch("/api/load", { cache: "no-store" });
+      const d = await r.json();
+      if (!r.ok) { setError(d.error || "load read failed"); return; }
+      setError(null); setData(d); setPulse(true); setTimeout(() => setPulse(false), 400);
+    } catch (err) { setError(String(err)); }
+  }, []);
+
+  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    if (!auto) return undefined;
+    const id = setInterval(refresh, 2500);
+    return () => clearInterval(id);
+  }, [auto, refresh]);
+
+  if (error) return <div className="panel error" role="alert">Could not read load: {error}. Is the ledger at ~/.paseo/router-load.jsonl readable?</div>;
+  if (!data) return <div className="panel"><div className="empty"><div className="spinner" aria-hidden="true" /><p>Reading load ledger...</p></div></div>;
+
+  const host = data.host || {};
+  const windowHrs = Math.round((data.windowSec || 18000) / 3600);
+  const idle = !data.sources.length && !data.models.length;
+
+  return (
+    <div className="grid">
+      <section className="panel form">
+        <div className="editor-section__head">
+          <h2>Live load</h2>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span className={`refresh-dot ${pulse ? "on" : ""}`} aria-hidden="true" />
+            <label className="field" style={{ flexDirection: "row", alignItems: "center", gap: "6px", margin: 0 }}>
+              <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} /> <span>Auto</span>
+            </label>
+            <button className="btn btn-sm" onClick={refresh}>Refresh</button>
+          </div>
+        </div>
+        <p className="sub">In-flight dispatches and rolling {windowHrs}h usage, reconciled from the shared router ledger. The router soft-penalizes a source as it fills its concurrency cap and a model as it nears its 5h quota. <strong>{data.totalInflight}</strong> agent(s) in flight now.</p>
+
+        <h3 style={{ marginBottom: "8px" }}>Host pressure</h3>
+        <div className="meta">
+          <Meta k="CPU" v={pct(host.cpuSat)} />
+          <Meta k="memory" v={pct(host.memSat)} />
+          <Meta k="load (1m)" v={(host.load1 ?? 0).toFixed(2)} />
+          <Meta k="cores" v={host.cores} />
+        </div>
+        <div className="bar"><span style={{ width: pct(Math.min(host.cpuSat || 0, 1)), background: (host.cpuSat || 0) > 0.8 ? "var(--bad)" : "var(--p-local)" }} /></div>
+        <p className="sub dim">Local-model picks are penalized once host saturation passes 80%, steering fan-out to cloud instead of thrashing this machine.</p>
+      </section>
+
+      <section className="panel">
+        {idle && <div className="empty"><p>No active dispatches and no usage in the window. The ledger fills as <code>paseo-boo</code> reserves a pick at dispatch and releases it at closure.</p></div>}
+
+        {data.sources.length > 0 && (
+          <div className="cands">
+            <h3>By source (concurrency)</h3>
+            <ul className="candlist">
+              {data.sources.map((s) => (
+                <li key={s.src} className={`cand ${s.inflight > s.softCap ? "out" : ""}`}>
+                  <div className="cand-top">
+                    <span className="chip" style={{ "--c": `var(--p-${s.src})` }}>{SOURCE_LABEL[s.src] || s.src}</span>
+                    <span className="score">{s.inflight}/{s.softCap}</span>
+                    {s.inflight > s.softCap && <span className="tag bad">over cap</span>}
+                  </div>
+                  <LoadBar value={s.inflight} max={s.softCap} over={s.inflight > s.softCap} src={s.src} />
+                  <p className="cand-reason">{s.inflight} in flight · {s.usage} dispatched this window</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {data.models.length > 0 && (
+          <div className="cands">
+            <h3>By model (5h quota)</h3>
+            <ul className="candlist">
+              {data.models.map((m) => {
+                const near = m.quota > 0 && m.remaining / m.quota < 0.15;
+                return (
+                  <li key={m.key} className="cand">
+                    <div className="cand-top">
+                      <code className="cand-id">{m.key}</code>
+                      {m.quota > 0 ? <span className="score">{m.usage}/{m.quota}</span> : <span className="tag">no quota set</span>}
+                      {m.inflight > 0 && <span className="tag warn">{m.inflight} in flight</span>}
+                      {near && <span className="tag bad">near limit</span>}
+                    </div>
+                    {m.quota > 0 && <LoadBar value={m.usage} max={m.quota} over={near} />}
+                    <p className="cand-reason">{m.quota > 0 ? `${m.remaining} of ${m.quota} requests left this 5h window` : `${m.usage} dispatched this window`}</p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         )}
       </section>
     </div>
