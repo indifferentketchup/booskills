@@ -52,19 +52,20 @@ export function snapshot(now, { windowSec = 5 * 3600, ttlSec = 1800 } = {}) {
 
   const windowStart = now - windowSec * 1000;
   const released = new Set();
+  const relTokens = {}; // id -> actual token spend from release record
   const reservations = [];
   for (const line of raw.split("\n")) {
     if (!line) continue;
     let rec;
     try { rec = JSON.parse(line); } catch { continue; }
-    if (rec.t === "rel" && rec.id) released.add(rec.id);
+    if (rec.t === "rel" && rec.id) { released.add(rec.id); if (rec.tok) relTokens[rec.id] = rec.tok; }
     else if (rec.t === "res") reservations.push(rec);
   }
 
   const byKey = {};
   const bySrc = {};
   const tally = (bucket, field) => {
-    const slot = bucket[field] || (bucket[field] = { inflight: 0, usage: 0 });
+    const slot = bucket[field] || (bucket[field] = { inflight: 0, usage: 0, tokens: 0 });
     return slot;
   };
   for (const r of reservations) {
@@ -72,8 +73,9 @@ export function snapshot(now, { windowSec = 5 * 3600, ttlSec = 1800 } = {}) {
     const done = r.id && released.has(r.id);
     const expired = now - r.at > ttlSec * 1000; // assume leaked if past TTL with no release
     const live = !done && !expired;
-    if (r.key) { const s = tally(byKey, r.key); s.usage += 1; if (live) s.inflight += 1; }
-    if (r.src) { const s = tally(bySrc, r.src); s.usage += 1; if (live) s.inflight += 1; }
+    const tok = (r.id && relTokens[r.id]) || r.tok || 0;
+    if (r.key) { const s = tally(byKey, r.key); s.usage += 1; s.tokens += tok; if (live) s.inflight += 1; }
+    if (r.src) { const s = tally(bySrc, r.src); s.usage += 1; s.tokens += tok; if (live) s.inflight += 1; }
   }
 
   if (raw.length > COMPACT_BYTES) compact(reservations, released, windowStart);
