@@ -95,6 +95,11 @@ for name, model in agents_map.items():
 def inject_model(text, model):
     """Insert a model: line into YAML frontmatter, replacing any existing one.
     Returns text unchanged if the file has no '---' frontmatter block."""
+    import re
+    # Strip newlines to prevent YAML frontmatter injection via multi-line model IDs.
+    model = model.replace("\n", "").replace("\r", "")
+    if not re.match(r'^[\w./:@=-]+$', model):
+        raise ValueError(f"model value contains invalid characters: {model!r}")
     if not text.startswith("---"):
         return None
     parts = text.split("---", 2)

@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import * as ledger from "./load-ledger.mjs";
 
 const DEFAULT_MODEL_TIERS = "~/.paseo/model-tiers.json";
 const DEFAULT_PRESET = "~/.paseo/orchestration-preferences.json";
@@ -69,6 +70,11 @@ function parseArgs(argv) {
     else if (arg === "--resident-local") args.residentLocal = next() || "";
     else if (arg === "--preset") args.presetPath = next();
     else if (arg === "--model-tiers") args.modelTiersPath = next();
+    else if (arg === "--reserve") args.reserve = next() || "";
+    else if (arg === "--release") args.release = next() || "";
+    else if (arg === "--tokens") args.tokens = Number(next() || 0);
+    else if (arg === "--no-ledger") args.noLedger = true;
+    else if (arg === "--load-snapshot") args.loadSnapshot = true;
     else if (arg === "--help" || arg === "-h") args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -199,8 +205,8 @@ function sourceOf(provider) {
   return "other";
 }
 
-// Economics tiebreak: provider priority, cost, quota, locality, residency, preset order.
-function economics(provider, key, request, registry, presetIndex) {
+// Economics tiebreak: provider priority, cost, quota, live load, locality, residency.
+function economics(provider, key, request, registry, presetIndex, loadCtx) {
   const reasons = [];
   let score = 0;
   const add = (points, reason) => { score += points; if (points) reasons.push(`${points > 0 ? "+" : ""}${points.toFixed(1)} ${reason}`); };
@@ -236,10 +242,26 @@ function economics(provider, key, request, registry, presetIndex) {
 
   add(-presetIndex * 0.01, "preset order");
 
+  // Live load: soft penalties for in-flight crowding, quota exhaustion, and (local
+  // only) host saturation. Reconciled from the shared cross-process ledger.
+  if (loadCtx) {
+    const adj = ledger.loadAdjustment({
+      src,
+      isLocal: local,
+      inflight: loadCtx.bySrc?.[src]?.inflight,
+      usage: loadCtx.byKey?.[key]?.usage,
+      quota,
+      host: loadCtx.host,
+      tuning: loadCtx.tuning,
+    });
+    score += adj.score;
+    reasons.push(...adj.reasons);
+  }
+
   return { score, cost, quota, isLocal: local, band: pricing._band || "base", reasons };
 }
 
-function scoreCandidate(provider, request, registry, neverSub, presetIndex) {
+function scoreCandidate(provider, request, registry, neverSub, presetIndex, loadCtx) {
   const key = modelKey(provider);
   const normalized = normalizeModelId(provider);
   const attrs = registry.attributes?.[key];
@@ -250,7 +272,7 @@ function scoreCandidate(provider, request, registry, neverSub, presetIndex) {
   }
 
   const fit = fitScore(attrs, request);
-  const econ = economics(provider, key, request, registry, presetIndex);
+  const econ = economics(provider, key, request, registry, presetIndex, loadCtx);
 
   return {
     provider,
@@ -270,6 +292,35 @@ function scoreCandidate(provider, request, registry, neverSub, presetIndex) {
   };
 }
 
+// Merge the registry's optional `load` block over the code defaults (concurrency
+// caps merge per-source rather than replacing the map wholesale).
+function mergeTuning(registry) {
+  return {
+    ...ledger.LOAD_DEFAULTS,
+    ...(registry.load || {}),
+    concurrency_soft: { ...ledger.LOAD_DEFAULTS.concurrency_soft, ...(registry.load?.concurrency_soft || {}) },
+  };
+}
+
+// Resolve the live-load context once per routing call: merged tuning, the
+// reconciled cross-process ledger snapshot, and host pressure. Returns null when
+// load awareness is disabled, so the scorer falls back to stateless behavior.
+function buildLoadContext(request, registry) {
+  const tuning = mergeTuning(registry);
+  if (request.noLedger || tuning.enabled === false) return null;
+  const snap = ledger.snapshot(Date.now(), { windowSec: tuning.window_sec, ttlSec: tuning.reservation_ttl_sec });
+  return { byKey: snap.byKey, bySrc: snap.bySrc, host: ledger.hostLoad(), tuning };
+}
+
+// Emit the raw load snapshot as JSON for the control UI's dashboard. Self-contained
+// so the UI can shell out the same way it runs a routing decision.
+function printLoadSnapshot(args) {
+  const registry = readJson(args.modelTiersPath);
+  const tuning = mergeTuning(registry);
+  const snap = ledger.snapshot(Date.now(), { windowSec: tuning.window_sec, ttlSec: tuning.reservation_ttl_sec });
+  console.log(JSON.stringify({ now: Date.now(), host: ledger.hostLoad(), byKey: snap.byKey, bySrc: snap.bySrc, tuning }));
+}
+
 function chooseProvider(request, preset, registry) {
   if (!ROLES.has(request.role)) throw new Error(`Role must be one of: ${[...ROLES].join(", ")}`);
   if (!DIFFICULTIES.has(request.difficulty)) throw new Error(`Difficulty must be one of: ${[...DIFFICULTIES].join(", ")}`);
@@ -285,7 +336,8 @@ function chooseProvider(request, preset, registry) {
   if (!Array.isArray(roleValue)) throw new Error(`Provider entry for ${request.role} must be a string or array`);
 
   const neverSub = neverSubagentSet(registry);
-  const scored = roleValue.map((provider, index) => scoreCandidate(provider, request, registry, neverSub, index));
+  const loadCtx = buildLoadContext(request, registry);
+  const scored = roleValue.map((provider, index) => scoreCandidate(provider, request, registry, neverSub, index, loadCtx));
   const survivors = scored.filter((c) => !c.eliminated).sort((a, b) => b.score - a.score);
 
   if (!survivors.length) {
@@ -401,6 +453,10 @@ Options:
   --requires <list>        Comma-separated hard modality needs, e.g. vision,computer-use
   --fanout <n>             Parallel agent count for this dispatch. Default: 1
   --resident-local <id>    Local model currently loaded in llama-swap (residency bonus)
+  --reserve <id>           Record this pick as in-flight under <id> (real dispatch)
+  --release <id>           Mark dispatch <id> complete; no routing performed
+  --tokens <n>             Optional token spend recorded with --reserve/--release
+  --no-ledger              Ignore the shared load ledger (stateless routing)
   --json                   Print JSON
   --explain                Print full per-candidate scoring trace
   --dry-run-samples        Run sample selections
@@ -420,8 +476,16 @@ function runOne(args) {
     fanout: args.fanout,
     requires: args.requires,
     residentLocal: args.residentLocal,
+    noLedger: args.noLedger,
   };
   const result = chooseProvider(request, preset, registry);
+
+  // Record the pick so sibling fan-out calls see it as in-flight. Only with an
+  // explicit --reserve id (a real dispatch); previews and samples never write.
+  if (args.reserve && !args.noLedger) {
+    ledger.reserve({ id: args.reserve, key: modelKey(result.provider), src: sourceOf(result.provider), at: Date.now(), tokens: args.tokens });
+  }
+
   if (args.json) console.log(JSON.stringify({ request, result }, null, 2));
   else printHuman(result, request, args.presetPath, args.explain);
 }
@@ -441,6 +505,9 @@ function runSamples(args) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) return usage();
+  if (args.loadSnapshot) return printLoadSnapshot(args);
+  // Release-only: mark a prior dispatch complete so it stops counting as in-flight.
+  if (args.release) return ledger.release(args.release, { at: Date.now(), tokens: args.tokens });
   if (args.dryRunSamples) return runSamples(args);
   if (!args.role) throw new Error("--role is required unless --dry-run-samples is used");
   runOne(args);

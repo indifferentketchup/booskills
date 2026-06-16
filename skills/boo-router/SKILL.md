@@ -10,7 +10,7 @@ description: >
   subagents. Do NOT use to dispatch a skill to a subagent; that is paseo-boo. Do
   NOT use to decompose a goal into a skill pipeline; that is boo-meta.
 metadata:
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Boo-Router
@@ -30,9 +30,10 @@ Not sized. One deterministic call per resolution, no fan-out, no agents dispatch
    ```
    node ~/.agents/skills/boo-router/scripts/router.mjs --role <role> --task "<task>" \
      [--priority <p>] [--difficulty <d>] [--context-tokens <n>] [--requires <list>] \
-     [--fanout <n>] [--resident-local <id>] [--preset <path>] --json
+     [--fanout <n>] [--resident-local <id>] [--reserve <id>] [--no-ledger] [--preset <path>] --json
    ```
    It defaults to the active preset and registry; pass `--preset`/`--model-tiers` only to override.
+   - Load awareness: the router reconciles a shared cross-process ledger (`~/.paseo/router-load.jsonl`) so concurrent fan-out dispatches spread across providers instead of all picking the same top score. Pass `--reserve <id>` on a real dispatch to record the pick as in-flight (the dispatcher, paseo-boo, then calls `--release <id>` at closure); omit it for a preview. `--no-ledger` routes statelessly. The penalties are soft: in-flight crowding vs a per-source `concurrency_soft` cap, remaining 5h quota, and host saturation for local models. They nudge, they never eliminate a candidate.
 3. Read `result.provider` from the JSON. Pass EXACTLY that string to `create_agent`'s `provider` field.
 4. Apply `result.reasoning` `{ effort, apply }` to the dispatched model. OpenCode uses one unified option, `reasoningEffort` (verified in the opencode binary: it emits `reasoning_effort` for OpenAI/DeepSeek/MiniMax and maps to an Anthropic thinking budget):
    - `effort` is a concrete value (`high`, `max`, `medium`, `none`, etc.) -> set `options.reasoningEffort = <effort>` on the model (OpenCode per-model config options, or the model option at create_agent).

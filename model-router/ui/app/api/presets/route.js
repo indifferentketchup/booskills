@@ -31,6 +31,9 @@ export async function POST(request) {
       return NextResponse.json({ error: `preset "${trimmed}" already exists` }, { status: 409 });
     }
     if (body.duplicate) {
+      if (!existing.includes(body.duplicate)) {
+        return NextResponse.json({ error: `preset "${body.duplicate}" not found` }, { status: 404 });
+      }
       const template = await readPreset(body.duplicate);
       await createPreset(trimmed, template);
     } else {
