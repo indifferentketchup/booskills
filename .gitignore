@@ -10,6 +10,11 @@ dist/
 .commandcode/
 .boocontext/
 .ast-cache/
+.firecrawl/
+.learnings/
+.omo/
+.pi/
+.impeccable/
 .idea/
 __pycache__/
 *.pyc
@@ -26,3 +31,8 @@ forks/
 
 # Local per-service env (e.g. tailnet bind IPs) — never commit
 .env
+.env.local
+.env.*.local
+
+# Platform-specific local settings (never commit)
+.claude/settings.local.json
