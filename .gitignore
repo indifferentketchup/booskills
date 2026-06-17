@@ -7,7 +7,12 @@ dist/
 # Local tooling caches / session state (never ship)
 .aislop/
 .codesight/
+.commandcode/
+.boocontext/
+.ast-cache/
 .idea/
+__pycache__/
+*.pyc
 *.swp
 .DS_Store
 
