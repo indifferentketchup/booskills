@@ -85,11 +85,11 @@ Test triggering when it matters (high-use skills): ~20 labeled queries (8-10 sho
 **Procedures over declarations.** Teach the method that generalizes, not the answer to one instance.
 
 **Mandatory sections for every skill:**
-1. **Process** — numbered steps. Numbered steps get followed; prose gets interpreted.
-2. **What NOT to do** — single biggest lever against drift. Explicitly close the gaps the agent would otherwise fill.
-3. **Gotchas** — environment facts that defy reasonable assumptions. Highest-value content. Every correction you make to an agent in practice gets appended here. This is the maintenance loop.
-4. **Output format** — concrete template, not prose description. Models pattern-match templates reliably.
-5. **Failure modes** — what to do on error/empty/ambiguous input. Skills without failure handling produce confident garbage.
+1. **Process**  --  numbered steps. Numbered steps get followed; prose gets interpreted.
+2. **What NOT to do**  --  single biggest lever against drift. Explicitly close the gaps the agent would otherwise fill.
+3. **Gotchas**  --  environment facts that defy reasonable assumptions. Highest-value content. Every correction you make to an agent in practice gets appended here. This is the maintenance loop.
+4. **Output format**  --  concrete template, not prose description. Models pattern-match templates reliably.
+5. **Failure modes**  --  what to do on error/empty/ambiguous input. Skills without failure handling produce confident garbage.
 
 **Optional patterns, use when they fit:**
 - Checklists for multi-step workflows with dependencies.
@@ -130,8 +130,8 @@ Skills that fan out to agents classify work first: **small / medium / large**. D
 ## 7. YAGNI (inherit from Han)
 
 Two gates before any artifact item ships:
-1. **Evidence test** — needed now, with evidence?
-2. **Simpler-version test** — is there a strictly simpler version satisfying the same evidence?
+1. **Evidence test**  --  needed now, with evidence?
+2. **Simpler-version test**  --  is there a strictly simpler version satisfying the same evidence?
 
 Failures go to `## Deferred (YAGNI)` with a reopen-when trigger. Never silently dropped. Real triggers: a measured metric, an incident, a commitment, a regulation, a dependency landing. "When we have time" is not a trigger.
 

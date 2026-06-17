@@ -6,7 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 
-// llama-swap base URL — override via env when running in Docker or on a non-default port.
+// llama-swap base URL  --  override via env when running in Docker or on a non-default port.
 export const LLAMA_SWAP_URL = process.env.LLAMA_SWAP_URL || "http://localhost:8080";
 
 const execFileAsync = promisify(execFile);

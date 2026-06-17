@@ -135,7 +135,7 @@ Write the complete analysis to a file with this structure:
 
 ### Returned Summary
 
-Return this to the caller as plain markdown — do NOT wrap it in a fenced code block. This text must appear verbatim in the Summary section of the full analysis file:
+Return this to the caller as plain markdown  --  do NOT wrap it in a fenced code block. This text must appear verbatim in the Summary section of the full analysis file:
 
 ```
 ## Summary

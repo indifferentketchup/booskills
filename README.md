@@ -1,6 +1,6 @@
 # BooSkills
 
-Agent skill catalog, deterministic model router, and Paseo orchestration presets — personal, local-only.
+Agent skill catalog, deterministic model router, and Paseo orchestration presets  --  personal, local-only.
 
 ## What it is
 
@@ -69,4 +69,4 @@ Control panel at `http://localhost:3000` with Playground, Load dashboard, Provid
 | `subscription-low` | B | GPT-5.1-Mini + Haiku |
 | `subscription-mid` | A | GPT-5.4 + Sonnet |
 
-All presets use array pools — the orchestrator picks by situation via the model-router.
+All presets use array pools  --  the orchestrator picks by situation via the model-router.
