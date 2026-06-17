@@ -49,9 +49,11 @@ booskills/
 ├── evals/                     # Trigger evals: <skill>.json labeled queries + README protocol
 ├── model-router/              # Deterministic model selector (router.mjs + README); wrapped by skills/boo-router
 ├── docs/adr/                  # Architecture decision records (0001 = deterministic router)
+├── README.md                   # Entry-point documentation
 ├── research/
 │   ├── booskills-structure-research.md
-│   └── platform-packaging-notes.md
+│   ├── platform-packaging-notes.md
+│   └── architecture-analysis-report.md  # Complexity verdict + risk assessments
 ├── .claude-plugin/
 │   ├── plugin.json
 │   └── marketplace.json
@@ -102,10 +104,10 @@ None. All state lives on disk as files. The OpenSpec workflow uses folder-based 
 
 - **Install locally**: `bash scripts/install.sh` (symlinks preferred; `--copy` flag for copy mode)
 - **Validate OpenSpec change**: `openspec validate <id>` (exact CLI surface TBD per installed version)
-- **Git status**: repo initialized but has no commits yet (`master` branch, empty)
+- **Git status**: active on `main` branch, tagged v0.2.0 (architecture analysis), pushed to `indifferentketchup/booskills`
 
 ## Doc Drift
 
 1. **Resolved 2026-06-12**: `paseo-boo`, `boo-building-ui`, and `boo-refactoring-code` postdate the v1 spec; SKILL_CATALOG_SPEC.md now records them in a "Post-v1 additions" section.
 2. **Top-level `openspec/specs/` is empty.** The change folder `booskills-v1-catalog/specs/` holds 4 spec files, but no main specs have been synced yet; expected state until the change is archived or synced.
-4. **No README exists.** There is no README.md at the repo root. The `SKILL_CATALOG_SPEC.md` and `SKILL_GUIDELINES.md` serve as primary documentation, but there is no entry-point doc for a new user.
+3. **Presets restructured 2026-06-17**: grade-L renamed to grade-D, grade-F added (edge/embedding). All 12 presets now use array pools (zero pinned strings). workhorse-mid/premium/hybrid, credits-first, local-concurrent, mid, high removed. Router picks model by fit per dispatch.
