@@ -21,7 +21,7 @@ Classify small/medium/large from tree scope (single module vs whole repo). Defau
 ## Process
 
 1. Size by tree scope.
-2. Run mechanical detectors first (scripts/ per stack: lint, dead-code tools, duplication tools). If the `boocontext` MCP tools are available, run `boocontext_health` as one of them: A-F grades, hotspot files, and top refactoring targets seed the agent pass. Collect raw output in references/.
+2. Run mechanical detectors first (scripts/ per stack: lint, dead-code tools, duplication tools). If the `boocontext` MCP tools are available, run `boocontext_health` (A-F grades, hotspot files, top refactoring targets) and `boocontext_severity` (severity-classified hotspots with git churn — INFO/MINOR/MAJOR/CRITICAL across MAINTAINABILITY/RELIABILITY/SECURITY domains) to seed the agent pass. Collect raw output in references/.
 3. Agent pass on mechanical hits and sampled hot files: dispatch `structural-analyst` for refactor candidates, dispatch `behavioral-analyst` for logic quality on high-complexity files.
 4. Score each finding: impact (high/med/low) x effort (S/M/L).
 5. YAGNI gate optimizations: any optimization without a measured pain point (perf number, incident, recurring friction) goes to Deferred with the metric that would reopen it.
@@ -49,7 +49,7 @@ AI slop categories to detect (concrete grep/heuristic per category):
 ## Gotchas
 
 - **Evidence rule**: mechanical tool output is codebase-level evidence. Performance claims need measured numbers.
-- **boocontext is optional**: the MCP tools are not on every machine or harness. Probe, use when present, fall back to scripts and direct reads when absent. A `boocontext_*` tool returning `UNSAFE` or empty means fall back, not stop. It grades code files only; markdown-heavy scopes return no_data.
+- **boocontext is optional**: the MCP tools are not on every machine or harness. Probe, use when present, fall back to scripts and direct reads when absent. A `boocontext_*` tool returning `UNSAFE` or empty means fall back, not stop. These tools grade code files only; markdown-heavy scopes return no_data. `boocontext_severity` enriches health hotspots with git churn for triage priority (commits + recency = severity).
 <!-- standing-rules:pi:start -->
 - **Subagent visibility**: when the Paseo MCP tools (`mcp__paseo__*`) are available, spawn each agent persona as an attached Paseo subagent with `create_agent` (`detached: false`, `notifyOnFinish: true`; for an opencode provider also pass `settings.modeId: "build"` and `settings.features.auto_accept: true`) so every persona appears in the operator's Paseo agent track. Resolve each persona's provider/model from the active preset's `agents` map in `~/.paseo/orchestration-preferences.json`; supervise on the finish notification (never poll) and read each result with `get_agent_activity`.
 - **Subagent fallback**: when the Paseo MCP tools are not available, use the platform's native subagent dispatch. On a platform with no subagent dispatch at all (for example Pi), read each `agents/<name>.md` persona and apply its lens in sequential passes.

@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { checkLocalProvider, checkOpenRouter } from "../../../lib/paseo.js";
+import { checkLocalProvider } from "../../../lib/paseo.js";
 
-// Provider health snapshot: fans out to each source that exposes a live API.
-// Local (llama-swap): /health + /running. OpenRouter: /credits + /key.
+// Provider health snapshot: polls each source that exposes a live health API.
+// Currently: local inference (llama-swap /health + /running).
 // Not cached so the panel stays current.
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const [local, openrouter] = await Promise.all([checkLocalProvider(), checkOpenRouter()]);
-    return NextResponse.json({ providers: [local, openrouter] });
+    const local = await checkLocalProvider();
+    return NextResponse.json({ providers: [local] });
   } catch (error) {
     return NextResponse.json({ error: String(error.message || error) }, { status: 500 });
   }
