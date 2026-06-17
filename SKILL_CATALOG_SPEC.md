@@ -207,7 +207,7 @@ Hard handoff rule: each arrow is a separate Paseo dispatch with fresh context. N
 ## Build order
 
 1. reviewing-code (reference implementation; exercises sizing, fan-out, evidence, YAGNI, output template)
-2. Agent roster port (12 agents from Han) — needed by everything downstream
+2. Agent roster port (12 agents from Han)  --  needed by everything downstream
 3. investigating-failures
 4. mapping-project-context
 5. planning-changes + implementing-changes (pair; test on a real small BooCode change end-to-end)
