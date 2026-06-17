@@ -271,25 +271,6 @@ function Load() {
                 {!p.ok && <p className="sub dim">llama-swap not reachable. Local models will still be scored but host-health data is unavailable.</p>}
               </>
             )}
-            {p.src === "openrouter" && (
-              <>
-                <h3 style={{ marginBottom: "8px" }}>
-                  OpenRouter
-                  <span className="tag" style={{ marginLeft: "8px", background: p.ok ? "var(--p-openrouter)" : "var(--bad)", color: "#fff" }}>{p.ok ? "live" : "unavailable"}</span>
-                </h3>
-                {p.ok ? (
-                  <div className="meta">
-                    {p.balance != null && <Meta k="balance" v={`$${p.balance.toFixed(2)}`} />}
-                    {p.usageToday != null && <Meta k="today" v={`$${p.usageToday.toFixed(4)}`} />}
-                    {p.usageMonth != null && <Meta k="month" v={`$${p.usageMonth.toFixed(2)}`} />}
-                    {p.limitRemaining != null && <Meta k="limit left" v={`$${p.limitRemaining.toFixed(2)}`} />}
-                    <Meta k="latency" v={`${p.latencyMs}ms`} />
-                  </div>
-                ) : (
-                  <p className="sub dim">{p.reason || "Could not reach OpenRouter API."}</p>
-                )}
-              </>
-            )}
           </div>
         ))}
       </section>

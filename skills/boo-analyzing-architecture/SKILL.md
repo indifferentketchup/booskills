@@ -25,7 +25,7 @@ A current context map must exist. If one does not, run boo-mapping-project-conte
 ## Process
 
 1. Verify prerequisite: a context map exists (from boo-mapping-project-context). If not, stop and request it.
-2. If the `boocontext` MCP tools are available, gather hard structural evidence first and pass it to the analysts: `boocontext_callgraph` (callers/callees) and `boocontext_impact` (blast radius) seed `structural-analyst` and `behavioral-analyst`; `boocontext_health` (A-F grades, hotspots) seeds `risk-analyst`. This grounds the lenses in measured coupling instead of impressions. Skip when the tools are absent; the analysts still work from direct reads.
+2. If the `boocontext` MCP tools are available, gather hard structural evidence first and pass it to the analysts: `boocontext_callgraph` (callers/callees) and `boocontext_impact` (blast radius) seed `structural-analyst` and `behavioral-analyst`; `boocontext_health` (A-F grades, hotspots) and `boocontext_severity` (severity-classified hotspots with git churn) seed `risk-analyst`. This grounds the lenses in measured coupling instead of impressions. Skip when the tools are absent; the analysts still work from direct reads.
 3. Dispatch `structural-analyst`, `behavioral-analyst`, `concurrency-analyst`, and `risk-analyst` in parallel (each seeded with the boocontext evidence from step 2 when present).
 4. After all four report, dispatch `software-architect` to synthesize findings into recommendations.
 5. YAGNI gate every recommendation. Speculative abstractions, module splits justified by future flexibility, and refactoring paths without a measured forcing function go to Deferred.

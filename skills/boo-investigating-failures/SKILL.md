@@ -20,12 +20,13 @@ Classify small/medium/large from number of symptoms, subsystems involved, and wh
 ## Process
 
 1. Reproduce or characterize the failure first. Record the exact command, observed vs expected output, and any logs or stack traces.
-2. Dispatch `evidence-based-investigator` to gather concrete evidence (E# items with file:line).
-3. If the symptom suggests concurrency issues (races, deadlocks, async errors), dispatch `concurrency-analyst`.
-4. If the symptom suggests logic divergence or data flow issues, dispatch `behavioral-analyst`.
-5. Based on the evidence, form a root-cause statement and propose a fix as a described change (never applied).
-6. Dispatch `adversarial-validator` against the evidence summary and proposed fix. Produce V# validation findings.
-7. Produce the final report. Do not apply the fix.
+2. If the `boocontext` MCP tools are available, run `boocontext_explore` with the failure description to locate relevant code citations cheaply (routes, schemas, components, libs, middleware, events, hot files). Then run `boocontext_callgraph` on the failing function/symbol to get callers and callees. Pass these citations to the investigators. Skip when the tools are absent; the investigators work from direct reads.
+3. Dispatch `evidence-based-investigator` to gather concrete evidence (E# items with file:line).
+4. If the symptom suggests concurrency issues (races, deadlocks, async errors), dispatch `concurrency-analyst`.
+5. If the symptom suggests logic divergence or data flow issues, dispatch `behavioral-analyst`.
+6. Based on the evidence, form a root-cause statement and propose a fix as a described change (never applied).
+7. Dispatch `adversarial-validator` against the evidence summary and proposed fix. Produce V# validation findings.
+8. Produce the final report. Do not apply the fix.
 
 ## What NOT to do
 
@@ -47,6 +48,7 @@ Classify small/medium/large from number of symptoms, subsystems involved, and wh
 - **No em dashes**: never use em dashes (U+2014) in output or files you write.
 <!-- standing-rules:core:end -->
 - **Recon before write**: gather evidence before forming conclusions.
+- **boocontext is optional**: the MCP tools are not on every machine or harness. Probe, use when present, fall back to direct reads when absent. A `boocontext_*` tool returning `UNSAFE` or empty means fall back, not stop.
 
 ## Output format
 

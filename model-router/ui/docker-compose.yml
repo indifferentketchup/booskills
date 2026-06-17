@@ -15,7 +15,7 @@ services:
     container_name: model-router-ui
     # user: "${DOCKER_USER:-1000:1000}"
     ports:
-      - "4319:4319"
+      - "${MR_BIND:-0.0.0.0}:4319:4319"
     volumes:
       - "${PASEO_DIR:-${HOME}/.paseo}:/data/paseo"
     restart: unless-stopped
