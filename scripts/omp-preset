@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Sync OMP modelRoles from a Paseo orchestration preset.
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PRESETS_DIR="${PASEO_PRESETS_DIR:-$HOME/.paseo/presets}"
+ACTIVE="${PASEO_ACTIVE_PRESET:-$HOME/.paseo/orchestration-preferences.json}"
+OMP_CONFIG="${OMP_CONFIG:-$HOME/.omp/agent/config.yml}"
+
+usage() { echo "Usage: omp-preset [preset-name | --from-active]"; }
+
+pick_preset_file() {
+  local name="${1:-}"
+  if [ "$name" = "--from-active" ]; then
+    [ -f "$ACTIVE" ] || { echo "No active preset" >&2; exit 1; }
+    echo "$ACTIVE"; return
+  fi
+  [ -n "$name" ] || { usage >&2; exit 1; }
+  local src="$PRESETS_DIR/${name}.json"
+  [ -f "$src" ] || { echo "Unknown preset: $name" >&2; exit 1; }
+  echo "$src"
+}
+
+case "${1:-}" in -h|--help) usage; exit 0 ;; esac
+preset_file="$(pick_preset_file "${1:-}")"
+python3 - "$preset_file" "$OMP_CONFIG" <<'PY'
+import json, sys
+from pathlib import Path
+import yaml
+preset = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+cfg_path = Path(sys.argv[2])
+agents = preset.get("agents") or {}
+providers = preset.get("providers") or {}
+impl = providers.get("impl") or []
+planning = providers.get("planning") or []
+
+def first(*values):
+    for v in values:
+        if v: return v
+    return None
+
+def prefer_openrouter(pool):
+    for e in pool:
+        if e.startswith("openrouter/"): return e
+    return pool[0] if pool else None
+
+def find_prefix(pool, prefix):
+    for e in pool:
+        if prefix in e: return e
+    return None
+
+roles = {"default": first(find_prefix(impl, "deepseek/"), agents.get("junior-developer"), impl[0] if impl else None),
+         "task": first(agents.get("evidence-based-investigator"), prefer_openrouter(impl))}
+roles["smol"] = roles["task"]
+plan = first(agents.get("software-architect"), find_prefix(planning, "glm-5"), find_prefix(impl, "glm-5"))
+if plan: roles["plan"] = plan
+if agents.get("user-experience-designer"): roles["designer"] = agents["user-experience-designer"]
+roles = {k: v for k, v in roles.items() if v}
+doc = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) if cfg_path.is_file() else {}
+doc = doc or {}
+doc.setdefault("modelRoles", {}).update(roles)
+cfg_path.parent.mkdir(parents=True, exist_ok=True)
+with cfg_path.open("w", encoding="utf-8") as fh:
+    yaml.safe_dump(doc, fh, sort_keys=False, default_flow_style=False)
+print(f"OMP modelRoles from preset {preset.get("preset", sys.argv[1])}:")
+for k, v in roles.items(): print(f"  {k}: {v}")
+print(f"Wrote: {cfg_path}")
+PY

@@ -11,6 +11,7 @@ const ROLES = new Set(["impl", "ui", "audit", "research", "planning"]);
 const DIFFICULTIES = new Set(["simple", "standard", "hard"]);
 const BUDGETS = new Set(["cost_sensitive", "balanced", "quality"]);
 const LOCAL_MODEL_MARKER = "==qwen==/";
+const LOCAL_PROVIDER_PREFIX = "llama-swap/";
 
 // Quality grade -> numeric. S>A>B>C; L (local) ranks with C on the quality axis.
 const GRADE_VALUE = { S: 4, A: 3, B: 2, C: 1, L: 1 };
@@ -88,13 +89,21 @@ function normalizeModelId(provider) {
   return String(provider).replace(/^opencode\//, "");
 }
 
+function registryLookupKey(provider, registry) {
+  const key = modelKey(provider);
+  const aliases = registry.key_aliases;
+  if (aliases && typeof aliases[key] === "string") return aliases[key];
+  return key;
+}
+
 function modelKey(provider) {
   const parts = normalizeModelId(provider).split("/");
   return parts[parts.length - 1];
 }
 
 function isLocalProvider(provider) {
-  return normalizeModelId(provider).startsWith(LOCAL_MODEL_MARKER);
+  const normalized = normalizeModelId(provider);
+  return normalized.startsWith(LOCAL_PROVIDER_PREFIX) || normalized.startsWith(LOCAL_MODEL_MARKER);
 }
 
 // Models flagged neverSubagent in any tier object must never be routed (the
@@ -196,14 +205,26 @@ function fitScore(attrs, request) {
 // Order matters: check the cloud gateways before the generic opencode markers.
 function sourceOf(provider) {
   const s = String(provider);
+  if (s.startsWith("deepseek/")) return "deepseek";
   if (s.includes("digitalocean")) return "digitalocean";
-  if (s.includes("openrouter")) return "openrouter";
+  if (s.startsWith("kilo/")) return "kilo";
+  if (s.startsWith("openrouter/") || s.includes("openrouter")) return "openrouter";
   if (s.startsWith("reasonix/")) return "reasonix";
+  if (s.startsWith(LOCAL_PROVIDER_PREFIX)) return "local";
   if (s.includes("==edge-")) return "local-edge";
   if (s.includes("==")) return "local";
   if (s.includes("opencode-go/")) return "opencode-go";
-  if (s.startsWith("claude/") || s.startsWith("codex/")) return "subscription";
-  if (s.includes("opencode/opencode/") || s.endsWith("-free")) return "opencode-zen";
+  if (
+    s.startsWith("anthropic/") ||
+    s.startsWith("claude/") ||
+    s.startsWith("openai-codex/") ||
+    s.startsWith("codex/") ||
+    s.startsWith("cursor/") ||
+    s.startsWith("google-antigravity/")
+  ) {
+    return "subscription";
+  }
+  if (s.includes("opencode/opencode/") || s.endsWith(":free")) return "gateway-free";
   return "other";
 }
 
@@ -221,15 +242,16 @@ function economics(provider, key, request, registry, presetIndex, loadCtx) {
   const pp = registry.provider_priority?.[src];
   if (typeof pp === "number" && pp) add(pp, `provider ${src}`);
 
-  const pricing = pricingForContext(key, registry, request.contextTokens);
+  const regKey = registryLookupKey(provider, registry);
+  const pricing = pricingForContext(regKey, registry, request.contextTokens);
   const cost = blendedCost(pricing);
   add(-cost * priority.costWeight, `blended cost $${cost.toFixed(3)}/M${pricing._band ? ` (${pricing._band})` : ""}`);
 
   // Speed priority: reward the per-model responsiveness signal (TTFT-oriented).
-  const speed = registry.speed?.[key];
+  const speed = registry.speed?.[regKey];
   if (priority.speedWeight && typeof speed === "number") add(speed * priority.speedWeight, `speed ${speed}`);
 
-  const quota = Number(registry.quotas_per_5h?.[key] ?? (isLocalProvider(provider) ? 200 : 0));
+  const quota = Number(registry.quotas_per_5h?.[regKey] ?? (isLocalProvider(provider) ? 200 : 0));
   add(Math.min(quota, 30000) / 1000, `quota ${quota}/5h`);
 
   const local = isLocalProvider(provider);
@@ -265,8 +287,9 @@ function economics(provider, key, request, registry, presetIndex, loadCtx) {
 
 function scoreCandidate(provider, request, registry, neverSub, presetIndex, loadCtx) {
   const key = modelKey(provider);
+  const regKey = registryLookupKey(provider, registry);
   const normalized = normalizeModelId(provider);
-  const attrs = registry.attributes?.[key];
+  const attrs = registry.attributes?.[regKey];
   const dq = disqualify(key, attrs, request, neverSub);
 
   if (dq) {
@@ -356,7 +379,8 @@ function chooseProvider(request, preset, registry) {
 // pressure (reasoning consumes output headroom that a near-full window lacks).
 function resolveReasoning(provider, registry, difficulty, contextTokens = 0, priorityName = "balanced") {
   const key = modelKey(provider);
-  const r = registry.reasoning?.[key];
+  const regKey = registryLookupKey(provider, registry);
+  const r = registry.reasoning?.[regKey];
   if (!r) return { effort: "auto", apply: "no reasoning profile in registry; leave model default" };
   if (r.effort === "auto") return { effort: "auto", apply: "model self-manages; do not set reasoningEffort" };
 
@@ -379,7 +403,7 @@ function resolveReasoning(provider, registry, difficulty, contextTokens = 0, pri
   }
   // Context-pressure downgrade: past 70% of the model's ctx_max, step down one
   // level so reasoning leaves room for output (levels are ordered low->high).
-  const ctxMax = registry.attributes?.[key]?.ctx_max;
+  const ctxMax = registry.attributes?.[regKey]?.ctx_max;
   if (levels && contextTokens > 0 && ctxMax && contextTokens > ctxMax * 0.7) {
     const i = levels.indexOf(effort);
     if (i > 0) { effort = levels[i - 1]; notes.push(`stepped down for context pressure (>${Math.round(ctxMax * 0.7)})`); }
@@ -393,10 +417,23 @@ function resolveReasoning(provider, registry, difficulty, contextTokens = 0, pri
 // bypass/yolo (registry permissions._default); settings go to create_agent.
 function resolvePermissions(provider, registry) {
   let backend = String(provider).split("/")[0];
-  if (backend.startsWith("oc-")) backend = "opencode"; // oc-digitalocean/oc-openrouter/oc-sam-desktop/oc-embedding extend opencode
+  if (backend.startsWith("oc-")) backend = "opencode";
+  const backendAliases = {
+    anthropic: "claude",
+    "openai-codex": "codex",
+    claude: "claude",
+    codex: "codex",
+  };
+  const permBackend = backendAliases[backend] ?? backend;
   const mode = registry.permissions?._default || "bypass";
-  const p = registry.permissions?.[backend];
-  if (!p) return { backend, mode, settings: null, note: "no permission profile for this backend; pass nothing" };
+  const p = registry.permissions?.[permBackend];
+  if (!p) {
+    const piBackends = new Set(["deepseek", "kilo", "openrouter", "cursor", "google-antigravity", "llama-swap"]);
+    const note = piBackends.has(backend)
+      ? "Pi/OMP session: pass provider/model only; no create_agent permission profile"
+      : "no permission profile for this backend; pass nothing";
+    return { backend, mode, settings: null, note };
+  }
   return { backend, mode, settings: p[mode] ?? null, cliBypass: p.cli_bypass || null };
 }
 
@@ -518,9 +555,9 @@ function runOne(args) {
 
 function runSamples(args) {
   const samples = [
-    { ...args, presetPath: "~/.paseo/presets/workhorse-mid.json", role: "ui", task: "review a screenshot-heavy frontend flow with visual design risks", requires: ["image"], contextTokens: 120000, difficulty: "standard", fanout: 1, explain: true },
-    { ...args, presetPath: "~/.paseo/presets/workhorse-mid.json", role: "impl", task: "apply a mechanical OpenSpec implementation across files", contextTokens: 80000, difficulty: "simple", fanout: 3, explain: true },
-    { ...args, presetPath: "~/.paseo/presets/workhorse-mid.json", role: "research", task: "browse a 1M-token repo and synthesize findings", contextTokens: 400000, difficulty: "hard", fanout: 1, explain: true },
+    { ...args, presetPath: "~/.paseo/presets/workhorse.json", role: "ui", task: "review a screenshot-heavy frontend flow with visual design risks", requires: ["image"], contextTokens: 120000, difficulty: "standard", fanout: 1, explain: true },
+    { ...args, presetPath: "~/.paseo/presets/workhorse.json", role: "impl", task: "apply a mechanical OpenSpec implementation across files", contextTokens: 80000, difficulty: "simple", fanout: 3, explain: true },
+    { ...args, presetPath: "~/.paseo/presets/workhorse.json", role: "research", task: "browse a 1M-token repo and synthesize findings", contextTokens: 400000, difficulty: "hard", fanout: 1, explain: true },
   ];
   for (const sample of samples) {
     runOne(sample);

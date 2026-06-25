@@ -15,9 +15,9 @@ Agent skill catalog, deterministic model router, and Paseo orchestration presets
 ```bash
 git clone git@github.com:indifferentketchup/booskills.git ~/opt/booskills
 cd ~/opt/booskills
-bash scripts/install.sh          # symlink skills + agents into ~/.agents/
-bash scripts/apply-agent-models.sh  # inject per-persona model assignments from Paseo active preset
+bash scripts/install.sh          # skills, presets, registry, agents, router CLI
 bash scripts/stamp-standing-rules.sh  # sync standing rules into all 16 skills
+paseo-preset workhorse             # switch active preset (+ sync OMP modelRoles)
 ```
 
 On Windows: `pwsh scripts/install.ps1` (copy mode; re-run after every pull).
@@ -56,17 +56,26 @@ Control panel at `http://localhost:3000` with Playground, Load dashboard, Provid
 
 | Preset | Grade | Pool |
 |--------|-------|------|
-| `grade-S` | S | Mimo-V2.5-Pro, GLM-5.1, Qwen3.7-Max, GPT-5.5, Opus, Fable |
-| `grade-A` | A | DeepSeek-V4-Pro, Qwen3.7-Plus, Kimi-K2.6, GLM-5, Sonnet, GPT-5.4 |
-| `grade-B` | B | MiniMax-M2.7, Mimo-V2.5-Pro, Haiku, GPT-5.1-Mini |
-| `grade-C` | C | MiMo-V2.5, DeepSeek-V4-Flash (legacy duo) |
+| `grade-S` | S | GLM-5.1, Qwen3.7-Max, GPT-5.5, Opus, Fable, Composer-2.5, Gemini-3.1-Pro |
+| `grade-A` | A | Qwen3.7-Plus, Kimi-K2.6, GLM-5, Sonnet, GPT-5.4, Composer-1.5 |
+| `grade-B` | B | MiniMax-M3, Mimo-V2.5-Pro, DeepSeek-V4-Pro, Haiku, GPT-5.1-Codex-Mini, Laguna-M.1, Owl-Alpha, Step-3.7-Flash |
+| `grade-C` | C | MiMo-V2.5, DeepSeek-V4-Flash |
 | `grade-D` | D | Qwen3.6-35b-a3b, Qwen3.6-27b (local, $0) |
-| `grade-F` | F | Edge/embedding models ($0) |
-| `workhorse` | C+A | MiMo-V2.5, DeepSeek-V4-Flash, MiniMax-M3 |
+| `grade-F` | F | llama-swap embed + gateway free-tier |
+| `workhorse` | C+A | MiMo-V2.5, DeepSeek-V4-Flash, MiniMax-M3, Step-3.7-Flash |
 | `workhorse-local` | D | Local qwen duo |
 | `local` | D | Nemotron Cascade 30B + Qwen 9B |
-| `free` | C | OpenCode Zen free-tier models |
-| `subscription-low` | B | GPT-5.1-Mini + Haiku |
+| `free` | C | Gateway free-tier (Nemotron Ultra, MiniMax M2.5, Step 3.7 Flash) |
+| `subscription-low` | B | GPT-5.1-Codex-Mini + Haiku |
 | `subscription-mid` | A | GPT-5.4 + Sonnet |
 
 All presets use array pools  --  the orchestrator picks by situation via the model-router.
+Provider strings are Pi/OMP `provider/model` format (DeepSeek direct, openrouter/kilo dual pools, llama-swap local, native Anthropic/OpenAI-Codex/Cursor/Gemini).
+
+Regenerate and install presets after editing `scripts/generate-presets.py`:
+
+```bash
+bash scripts/seed-presets.sh       # regenerate presets + model-tiers.json, install CLIs
+paseo-preset <name>                # activate preset, sync OMP modelRoles, refresh OpenCode agents
+omp-preset <name>                  # sync OMP modelRoles only
+```

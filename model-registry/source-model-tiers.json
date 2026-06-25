@@ -1,0 +1,1210 @@
+{
+  "_comment": "Canonical model tiers. Paseo provider strings = 'opencode/' + opencode model id for opencode-routed models. subscription-high.neverSubagent: those models must NEVER be deployed as subagents under any circumstances.",
+  "workhorse": [
+    "opencode-go/mimo-v2.5",
+    "reasonix/deepseek-flash/deepseek-v4-flash"
+  ],
+  "workhorse-local": [
+    "==qwen==/qwen3.6-27b",
+    "==qwen==/qwen3.6-35b-a3b"
+  ],
+  "mid": [
+    "opencode-go/qwen3.7-plus",
+    "reasonix/deepseek-pro/deepseek-v4-pro",
+    "opencode-go/minimax-m2.7",
+    "opencode-go/qwen3.6-plus",
+    "opencode-go/mimo-v2.5-pro",
+    "opencode-go/minimax-m2.5",
+    "opencode-go/minimax-m3"
+  ],
+  "high": [
+    "opencode-go/kimi-k2.7-code",
+    "opencode-go/kimi-k2.6",
+    "opencode-go/kimi-k2.5",
+    "opencode-go/glm-5",
+    "opencode-go/glm-5.1",
+    "opencode-go/qwen3.7-max"
+  ],
+  "subscription-low": [
+    "codex/gpt-5.1-mini",
+    "claude/haiku"
+  ],
+  "subscription-mid": [
+    "claude/sonnet",
+    "codex/gpt-5.4"
+  ],
+  "subscription-high": {
+    "models": [
+      "codex/gpt-5",
+      "codex/gpt-5.5",
+      "claude/opus",
+      "claude/fable"
+    ],
+    "neverSubagent": true
+  },
+  "quotas_per_5h": {
+    "deepseek-v4-flash": 31650,
+    "mimo-v2.5": 30100,
+    "qwen3.7-plus": 4300,
+    "deepseek-v4-pro": 3450,
+    "minimax-m2.7": 3400,
+    "qwen3.6-plus": 3300,
+    "mimo-v2.5-pro": 3250,
+    "minimax-m3": 3200,
+    "kimi-k2.6": 1150,
+    "qwen3.7-max": 950,
+    "glm-5.1": 880,
+    "free-models": 200
+  },
+  "model_strengths": {
+    "_note": "Authoritative per-model strengths the orchestrator consults to pick the best-fit candidate from a role's option pool. Sourced from Sam's 2026-06 model briefing plus the pricing block below; supersedes the earlier derived seed. Benchmark figures are vendor or independent per the briefing.",
+    "deepseek-v4-flash": "Efficient open frontier-ish coding/agent (284B MoE / 13B active, MIT, 1M ctx). Low-latency, cheapest tier; the realistic V4 self-host target (160GB FP4+FP8, two H200s). Best for high-volume mechanical work; lighter and less careful than V4 Pro.",
+    "mimo-v2.5": "Xiaomi unified omnimodal (310B sparse MoE / 15B active). Native visual+audio; matches Gemini 3 Pro on video and Sonnet 4.6 on multimodal agentic, at half V2.5-Pro cost. Cheapest tier. Best cheap multimodal all-rounder and high-volume default.",
+    "deepseek-v4-pro": "Open frontier-tier (1.6T MoE / 49B active, MIT, 1M ctx). 80.6% SWE-bench Verified (highest open-weights, tied Gemini 3.1 Pro), 3206 Codeforces, 95.2 HMMT; Anthropic-API format. Best open coding/math at frontier for the price. Caveat: drops to 66% MRCR at full 1M, sweet spot 128K-512K.",
+    "mimo-v2.5-pro": "Xiaomi flagship reasoning/long-horizon (1.02T MoE / 42B active, MIT). Top ClawEval/GDPVal/SWE-bench Pro; 1000+ tool calls, native FP8, ~3x decode, harness awareness (self-manages context/memory toward the goal). Best for the hardest agentic SWE and harness self-management.",
+    "minimax-m3": "MiniMax multimodal long-context coding agent (MSA sparse attn, 1M ctx). 59.0% SWE-Bench Pro, 66.0% Terminal-Bench 2.1, 74.2% MCP-Atlas, 83.5 BrowseComp; native image/video input + desktop computer-use; 55 Intelligence Index. Best for computer-use and 1M multimodal repos. COST: a 3x usage-VALUE deal is in effect now (3x the tokens per dollar), so effective cost is one-third of list (~$0.10 in / ~$0.40 out), NOT $1.20; that makes M3 currently the CHEAPEST mid model AND one of the strongest, an exceptional value, lean on it while it lasts. Caveat: weights/license pending.",
+    "minimax-m2.7": "MiniMax text-only (~205K ctx). Cheap high-volume text agent. Best when you do not need M3's modalities or context.",
+    "minimax-m2.5": "Prior MiniMax text generation; general cheap text reasoning. Fallback for pinned integrations.",
+    "qwen3.7-max": "Alibaba agentic flagship, text-only, closed, 1M ctx. 69.7% Terminal-Bench 2.0-Terminus (beats DeepSeek-V4-Pro Max, Opus 4.6 Max, Kimi K2.6 Thinking); Anthropic-API compatible (Claude Code drop-in), 35h autonomous, 1000+ tool calls (internal claim). Top agentic-coding ceiling. Caveat: closed weights, priciest.",
+    "qwen3.7-plus": "Alibaba balanced multimodal, closed, 1M ctx. 60% cheaper than Max; text+video+image. 70.3 Terminal-Bench 2.0-Terminus, 79.0 ScreenSpot Pro (UI grounding). Best cheap multimodal + GUI/screen understanding. Note: pricing roughly triples over 256K ctx.",
+    "qwen3.6-plus": "Alibaba prior-gen Plus, closed. Stable integration target; 3.7 Plus is a drop-in id swap, so 3.6 Plus is the fallback if pinned. Note: pricing jumps over 256K ctx.",
+    "glm-5.1": "Z.ai agentic engineering flagship (744B MoE / 40B active, MIT, trained on Huawei Ascend). 58.4 SWE-Bench Pro (tops the leaderboard past GPT-5.4 and Opus 4.6); runs an autonomous plan/execute/test/fix/optimize loop up to 8h. Best for long-horizon autonomous coding with open weights.",
+    "glm-5": "Z.ai general open base (same 744B, MIT) that 5.1 post-trains from. First open-weights model to reach 50 on the Artificial Analysis Intelligence Index. Strong general base; pick 5.1 for coding (5 to 5.1 is post-train only).",
+    "kimi-k2.6": "Moonshot production-proven (1T MoE). Topped OpenRouter's weekly leaderboard on real API routing at launch. Best real-world adoption track record; stable drop-in if newer Kimi gains do not hold.",
+    "kimi-k2.5": "Moonshot prior-gen Kimi (1T MoE); strong general/coding predecessor. Fallback for pinned integrations.",
+    "kimi-k2.7-code": "Moonshot coding-agent specialist (1T MoE / 32B active, Modified MIT). 81.1 MCPMark Verified (beats Opus 4.8's 76.4, strongest open MCP tool-use); ~30% lower thinking-tokens vs K2.6, preserve-thinking across agent turns. Best for MCP/tool orchestration and token efficiency on long runs. Caveat: independent benchmarks being questioned; NOT yet in a tier or in opencode-go, confirm availability before routing to it.",
+    "qwen3.6-35b-a3b": "Local (llama-swap), $0, open MoE. Sam's current daily driver: MoE efficiency, vision via mmproj, runs MXFP4 on the 5090. Per Sam's benchmarks MTP gives no net gain here, so non-MTP stays the daily driver. Only one local model resident at a time.",
+    "qwen3.6-27b": "Local (llama-swap), $0, open dense. preserve_thinking baked in; dense arch shows ~1.49x MTP speedup in Sam's stack (vs the 35B-A3B MoE wash). Pick for draft-MTP workloads. Only one local model resident at a time.",
+    "diffusiongemma-26b-a4b": "Google DeepMind text-DIFFUSION (26B MoE / 3.8B active, Apache 2.0), not autoregressive. 700+ tok/s on an RTX 5090 (~18GB quantized); 256 tokens generated in parallel per pass, every token attends to all, 256K ctx, multimodal in. Best for raw single-user throughput and inline editing/code infill on Sam's hardware. Caveat: underperforms Gemma 4 on MMLU/coding, experimental (speed over quality); NOT in a tier, local small-model zoo only.",
+    "opus": "Anthropic reasoning flagship Opus 4.8 (1M ctx by default on API, 128K max output, adaptive thinking). Hardest reasoning, multi-file refactors, long-horizon agents; stronger agentic reliability + cheaper Fast mode than 4.7; accepts mid-conversation system messages without breaking prompt cache. S-tier, subscription/off-API-budget, NEVER a subagent.",
+    "gpt-5.5": "OpenAI coding+reasoning flagship (Codex 5.5, 128K out). Improves on 5.4 with fewer tokens; strong at holding context across large systems, reasoning through ambiguous failures, tool-checked assumptions, carrying changes through a codebase; reasoning none/low/medium/high/xhigh; text+image. Top-tier agentic SWE in Codex (xhigh for hardest). S-tier. Caveat: not yet API-key routable in Codex (ChatGPT sign-in only); use gpt-5.4-codex for API-key flows.",
+    "gpt-5.4": "OpenAI GPT-5.4 / Codex 5.4 coding specialist (1M ctx). Folds in 5.3-Codex's industry-leading coding plus improved tool/software-environment work; the API-key-routable Codex coding variant where 5.5 is not yet. A-tier.",
+    "sonnet": "Anthropic Sonnet 4.6 daily-driver default (256K ctx; 1M available but NOT auto-upgraded, costs credits even on Max). 79.6% SWE-bench Verified, within 1.2 pts of Opus at ~40% less cost and faster output. Strong coding/writing/analysis/computer-use/vision/doc creation. Best value/throughput default unless a task outgrows it. A-tier.",
+    "haiku": "Anthropic Haiku 4.5 fast/cheap tier (200K ctx, 64K out). ~97 tok/s; high-volume classification, routing, code review, extraction at scale; rivals Sonnet 4.0-level reasoning. Cheapest Claude per-token. B-tier.",
+    "gpt-5.1-mini": "OpenAI GPT-5.1(-Codex)-Mini cheap fast coding mini (400K ctx, from $0.25/M in). Near-flagship coding/reasoning at low cost, vision, tool use. High-frequency subagent calls, interactive edits, latency/cost-sensitive coding. B-tier; legacy-tier now (newer is GPT-5.4-mini) but the price/context ratio holds."
+  },
+  "attributes": {
+    "_note": "Structured per-model routing attributes. The router scores on THESE, not on the model_strengths prose (prose is human docs only). grade = S/A/B/C/L quality axis that --difficulty matches against (S>A>B>C, L=local). modalities = hard-filterable input capabilities. ctx_max = hard context ceiling (candidate eliminated if contextTokens exceeds it). ctx_sweet_spot = soft: past this, quality/cost degrades and the candidate is penalized. roles = 0..1 affinity per orchestration role. traits = soft keyword bonuses. routable=false hard-eliminates (license/availability hold).",
+    "deepseek-v4-flash": {
+      "grade": "C",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 1000000,
+      "ctx_sweet_spot": 512000,
+      "roles": {
+        "impl": 0.8,
+        "ui": 0.3,
+        "audit": 0.5,
+        "research": 0.6,
+        "planning": 0.4
+      },
+      "traits": [
+        "coding",
+        "high-volume",
+        "file-grinding",
+        "long-context",
+        "agent",
+        "mechanical"
+      ],
+      "routable": true
+    },
+    "mimo-v2.5": {
+      "grade": "C",
+      "modalities": [
+        "text",
+        "image",
+        "video",
+        "audio"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.6,
+        "ui": 0.7,
+        "audit": 0.5,
+        "research": 0.7,
+        "planning": 0.5
+      },
+      "traits": [
+        "multimodal",
+        "high-volume",
+        "visual",
+        "cheap"
+      ],
+      "routable": true
+    },
+    "deepseek-v4-pro": {
+      "grade": "S",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 1000000,
+      "ctx_sweet_spot": 512000,
+      "roles": {
+        "impl": 0.95,
+        "ui": 0.4,
+        "audit": 0.8,
+        "research": 0.7,
+        "planning": 0.8
+      },
+      "traits": [
+        "coding",
+        "math",
+        "frontier",
+        "validator",
+        "long-context",
+        "review"
+      ],
+      "routable": true
+    },
+    "mimo-v2.5-pro": {
+      "grade": "S",
+      "modalities": [
+        "text",
+        "image"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.9,
+        "ui": 0.5,
+        "audit": 0.85,
+        "research": 0.7,
+        "planning": 0.9
+      },
+      "traits": [
+        "agentic",
+        "long-horizon",
+        "harness",
+        "security",
+        "concurrency",
+        "careful",
+        "tool"
+      ],
+      "routable": true
+    },
+    "minimax-m3": {
+      "grade": "A",
+      "modalities": [
+        "text",
+        "image",
+        "video",
+        "computer-use"
+      ],
+      "ctx_max": 1000000,
+      "ctx_sweet_spot": 1000000,
+      "roles": {
+        "ui": 0.9,
+        "research": 0.85,
+        "planning": 0.8,
+        "impl": 0.55,
+        "audit": 0.6
+      },
+      "traits": [
+        "computer-use",
+        "multimodal",
+        "long-context",
+        "reasoning",
+        "ux",
+        "browse",
+        "grounding",
+        "tool"
+      ],
+      "routable": true
+    },
+    "minimax-m2.7": {
+      "grade": "B",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 205000,
+      "ctx_sweet_spot": 205000,
+      "roles": {
+        "impl": 0.6,
+        "ui": 0.2,
+        "audit": 0.5,
+        "research": 0.6,
+        "planning": 0.5
+      },
+      "traits": [
+        "text",
+        "cheap",
+        "high-volume"
+      ],
+      "routable": true
+    },
+    "minimax-m2.5": {
+      "grade": "B",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 205000,
+      "ctx_sweet_spot": 205000,
+      "roles": {
+        "impl": 0.55,
+        "ui": 0.2,
+        "audit": 0.45,
+        "research": 0.55,
+        "planning": 0.45
+      },
+      "traits": [
+        "text",
+        "cheap",
+        "fallback"
+      ],
+      "routable": true
+    },
+    "qwen3.7-max": {
+      "grade": "S",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 1000000,
+      "ctx_sweet_spot": 1000000,
+      "roles": {
+        "impl": 0.9,
+        "ui": 0.4,
+        "audit": 0.7,
+        "research": 0.7,
+        "planning": 0.85
+      },
+      "traits": [
+        "agentic",
+        "frontier",
+        "long-context",
+        "long-horizon",
+        "tool"
+      ],
+      "routable": true
+    },
+    "qwen3.7-plus": {
+      "grade": "A",
+      "modalities": [
+        "text",
+        "image",
+        "video"
+      ],
+      "ctx_max": 1000000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "ui": 0.85,
+        "research": 0.75,
+        "impl": 0.6,
+        "planning": 0.6,
+        "audit": 0.5
+      },
+      "traits": [
+        "multimodal",
+        "ui",
+        "grounding",
+        "screen",
+        "visual",
+        "video"
+      ],
+      "routable": true
+    },
+    "qwen3.6-plus": {
+      "grade": "B",
+      "modalities": [
+        "text",
+        "image"
+      ],
+      "ctx_max": 1000000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "ui": 0.6,
+        "research": 0.6,
+        "impl": 0.55,
+        "planning": 0.5,
+        "audit": 0.45
+      },
+      "traits": [
+        "multimodal",
+        "fallback",
+        "stable"
+      ],
+      "routable": true
+    },
+    "glm-5.1": {
+      "grade": "S",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 200000,
+      "ctx_sweet_spot": 200000,
+      "roles": {
+        "impl": 0.9,
+        "planning": 0.9,
+        "audit": 0.75,
+        "research": 0.65,
+        "ui": 0.4
+      },
+      "traits": [
+        "autonomous",
+        "long-horizon",
+        "coding",
+        "agentic"
+      ],
+      "routable": true
+    },
+    "glm-5": {
+      "grade": "A",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 200000,
+      "ctx_sweet_spot": 200000,
+      "roles": {
+        "impl": 0.7,
+        "planning": 0.7,
+        "research": 0.7,
+        "audit": 0.6,
+        "ui": 0.4
+      },
+      "traits": [
+        "general",
+        "coding",
+        "base"
+      ],
+      "routable": true
+    },
+    "kimi-k2.6": {
+      "grade": "A",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.8,
+        "audit": 0.7,
+        "planning": 0.7,
+        "research": 0.7,
+        "ui": 0.4
+      },
+      "traits": [
+        "tool",
+        "stable",
+        "production",
+        "general"
+      ],
+      "routable": true
+    },
+    "kimi-k2.5": {
+      "grade": "B",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.7,
+        "audit": 0.6,
+        "planning": 0.6,
+        "research": 0.6,
+        "ui": 0.3
+      },
+      "traits": [
+        "tool",
+        "fallback",
+        "general"
+      ],
+      "routable": true
+    },
+    "kimi-k2.7-code": {
+      "grade": "A",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.85,
+        "audit": 0.7,
+        "planning": 0.6,
+        "research": 0.6,
+        "ui": 0.3
+      },
+      "traits": [
+        "mcp",
+        "tool",
+        "coding",
+        "token-efficient"
+      ],
+      "routable": false,
+      "routable_note": "NOT yet in opencode-go and independent benchmarks questioned; flip to true once availability confirmed."
+    },
+    "qwen3.6-35b-a3b": {
+      "grade": "L",
+      "modalities": [
+        "text",
+        "image"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.6,
+        "research": 0.5,
+        "audit": 0.5,
+        "planning": 0.4,
+        "ui": 0.4
+      },
+      "traits": [
+        "local",
+        "vision",
+        "daily-driver",
+        "cheap"
+      ],
+      "routable": true
+    },
+    "qwen3.6-27b": {
+      "grade": "L",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.6,
+        "research": 0.5,
+        "audit": 0.5,
+        "planning": 0.4,
+        "ui": 0.2
+      },
+      "traits": [
+        "local",
+        "draft-mtp",
+        "cheap"
+      ],
+      "routable": true
+    },
+    "sonnet": {
+      "grade": "A",
+      "modalities": [
+        "text",
+        "image"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.8,
+        "ui": 0.7,
+        "audit": 0.75,
+        "research": 0.75,
+        "planning": 0.7
+      },
+      "traits": [
+        "coding",
+        "vision",
+        "computer-use",
+        "writing",
+        "analysis",
+        "doc",
+        "general",
+        "review"
+      ],
+      "routable": true
+    },
+    "haiku": {
+      "grade": "B",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 200000,
+      "ctx_sweet_spot": 200000,
+      "roles": {
+        "impl": 0.5,
+        "ui": 0.3,
+        "audit": 0.7,
+        "research": 0.6,
+        "planning": 0.4
+      },
+      "traits": [
+        "classification",
+        "routing",
+        "review",
+        "extraction",
+        "high-volume",
+        "cheap"
+      ],
+      "routable": true
+    },
+    "gpt-5.4": {
+      "grade": "A",
+      "modalities": [
+        "text",
+        "image"
+      ],
+      "ctx_max": 1000000,
+      "ctx_sweet_spot": 1000000,
+      "roles": {
+        "impl": 0.85,
+        "audit": 0.75,
+        "planning": 0.75,
+        "research": 0.7,
+        "ui": 0.5
+      },
+      "traits": [
+        "coding",
+        "tool",
+        "agentic",
+        "frontier",
+        "long-context",
+        "review"
+      ],
+      "routable": true
+    },
+    "gpt-5.1-mini": {
+      "grade": "B",
+      "modalities": [
+        "text",
+        "image"
+      ],
+      "ctx_max": 400000,
+      "ctx_sweet_spot": 400000,
+      "roles": {
+        "impl": 0.7,
+        "ui": 0.5,
+        "audit": 0.6,
+        "research": 0.6,
+        "planning": 0.5
+      },
+      "traits": [
+        "coding",
+        "cheap",
+        "fast",
+        "vision",
+        "tool",
+        "high-volume"
+      ],
+      "routable": true
+    },
+    "deepseek-4-flash": {
+      "grade": "C",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 1000000,
+      "ctx_sweet_spot": 512000,
+      "roles": {
+        "impl": 0.8,
+        "ui": 0.3,
+        "audit": 0.5,
+        "research": 0.6,
+        "planning": 0.4
+      },
+      "traits": [
+        "coding",
+        "high-volume",
+        "file-grinding",
+        "long-context",
+        "agent",
+        "mechanical"
+      ],
+      "routable": true,
+      "_note": "DigitalOcean's id for DeepSeek V4 Flash is literally 'deepseek-4-flash' (missing the v); same model as deepseek-v4-flash."
+    },
+    "qwen3.5-397b-a17b": {
+      "grade": "A",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 262144,
+      "ctx_sweet_spot": 262144,
+      "roles": {
+        "impl": 0.8,
+        "ui": 0.4,
+        "audit": 0.7,
+        "research": 0.7,
+        "planning": 0.75
+      },
+      "traits": [
+        "coding",
+        "agentic",
+        "frontier",
+        "reasoning"
+      ],
+      "routable": true,
+      "_note": "DigitalOcean large Qwen 3.5 MoE (397B/17B active); estimates, confirm."
+    },
+    "qwen3-coder-flash": {
+      "grade": "C",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 262144,
+      "ctx_sweet_spot": 262144,
+      "roles": {
+        "impl": 0.75,
+        "ui": 0.3,
+        "audit": 0.5,
+        "research": 0.55,
+        "planning": 0.45
+      },
+      "traits": [
+        "coding",
+        "cheap",
+        "fast",
+        "high-volume",
+        "file-grinding"
+      ],
+      "routable": true,
+      "_note": "DigitalOcean Qwen coding flash; estimates."
+    },
+    "glm-4.7": {
+      "grade": "A",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 200000,
+      "ctx_sweet_spot": 200000,
+      "roles": {
+        "impl": 0.75,
+        "planning": 0.7,
+        "audit": 0.65,
+        "research": 0.6,
+        "ui": 0.4
+      },
+      "traits": [
+        "coding",
+        "agentic",
+        "autonomous"
+      ],
+      "routable": true,
+      "_note": "OpenRouter prior-gen GLM coding; estimates."
+    },
+    "glm-5-turbo": {
+      "grade": "A",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 200000,
+      "ctx_sweet_spot": 200000,
+      "roles": {
+        "impl": 0.8,
+        "planning": 0.75,
+        "audit": 0.65,
+        "research": 0.65,
+        "ui": 0.4
+      },
+      "traits": [
+        "coding",
+        "agentic",
+        "fast"
+      ],
+      "routable": true,
+      "_note": "OpenRouter GLM-5 fast variant; estimates."
+    },
+    "nemotron-3-ultra-550b": {
+      "grade": "A",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 131072,
+      "ctx_sweet_spot": 131072,
+      "roles": {
+        "impl": 0.7,
+        "audit": 0.7,
+        "planning": 0.7,
+        "research": 0.7,
+        "ui": 0.4
+      },
+      "traits": [
+        "reasoning",
+        "agentic",
+        "frontier"
+      ],
+      "routable": true,
+      "_note": "NVIDIA Nemotron 3 Ultra (DO/OpenRouter); estimates."
+    },
+    "nemotron-3-super-120b": {
+      "grade": "B",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 131072,
+      "ctx_sweet_spot": 131072,
+      "roles": {
+        "impl": 0.65,
+        "audit": 0.6,
+        "planning": 0.6,
+        "research": 0.65,
+        "ui": 0.35
+      },
+      "traits": [
+        "reasoning",
+        "general"
+      ],
+      "routable": true,
+      "_note": "NVIDIA Nemotron 3 Super (DO/OpenRouter); estimates."
+    },
+    "command-a": {
+      "grade": "B",
+      "modalities": [
+        "text"
+      ],
+      "ctx_max": 256000,
+      "ctx_sweet_spot": 256000,
+      "roles": {
+        "impl": 0.55,
+        "audit": 0.6,
+        "planning": 0.55,
+        "research": 0.7,
+        "ui": 0.35
+      },
+      "traits": [
+        "general",
+        "rag",
+        "tool"
+      ],
+      "routable": true,
+      "_note": "Cohere Command A (OpenRouter); estimates."
+    }
+  },
+  "reasoning": {
+    "_note": "Reasoning the orchestrator applies AFTER the router picks a model, via the OpenCode model option reasoningEffort. VERIFIED in the opencode binary: OpenAIChat.lowerOptions emits reasoning_effort for OpenAI/DeepSeek/MiniMax and other openai-compatible providers; Anthropic maps reasoningEffort to an extended-thinking budget (low~16000, max~31999 budgetTokens). Allowed values are OpenCode's isReasoningEffort set: none, minimal, low, medium, high, xhigh, max. by_difficulty maps the request --difficulty to a value; absent that, use default. effort 'auto' = do NOT set reasoningEffort (leave the model default); OpenCode rejects reasoningEffort on non-reasoning models.",
+    "_apply": "Via Paseo (the normal path): pass create_agent settings.thinkingOptionId=<value>; Paseo maps it to the OpenCode model variant, the Claude SDK effort (thinking type adaptive), or the Codex reasoning_effort (verified paseo agent-manager.ts:1255 + per-provider agents). Standalone OpenCode CLI/config path: set options.reasoningEffort=<value> (lowered to reasoning_effort for openai-compatible, thinking budgetTokens for Anthropic). Skip entirely when value is 'auto'. OpenAI/Codex do NOT accept 'max'; DeepSeek does, and 'max' wants a large context window (>=384K) and generous output, and thinking ignores temperature.",
+    "deepseek-v4-pro": {
+      "levels": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "default": "high",
+      "by_difficulty": {
+        "simple": "low",
+        "standard": "high",
+        "hard": "max"
+      }
+    },
+    "deepseek-v4-flash": {
+      "levels": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "default": "high",
+      "by_difficulty": {
+        "simple": "low",
+        "standard": "high",
+        "hard": "max"
+      }
+    },
+    "minimax-m3": {
+      "effort": "auto",
+      "_note": "MiniMax M3 has a thinking/instant toggle at the MiniMax API, but OpenCode returns NO reasoningEffort variant for minimax (verified opencode transform.ts:646-658, returns {}), so it is NOT controllable via reasoningEffort through this stack; leave the model default."
+    },
+    "gpt-5.4": {
+      "levels": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium",
+      "by_difficulty": {
+        "simple": "low",
+        "standard": "medium",
+        "hard": "high"
+      }
+    },
+    "gpt-5.1-mini": {
+      "levels": [
+        "minimal",
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low",
+      "by_difficulty": {
+        "simple": "minimal",
+        "standard": "low",
+        "hard": "medium"
+      }
+    },
+    "sonnet": {
+      "levels": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "default": "medium",
+      "by_difficulty": {
+        "simple": "low",
+        "standard": "medium",
+        "hard": "high"
+      },
+      "_note": "Paseo Claude provider thinking ids for Sonnet 4.6 are low/medium/high/max (verified models.ts:8-93); xhigh is Opus 4.7+/Fable only."
+    },
+    "haiku": {
+      "effort": "auto",
+      "_note": "Paseo's Claude provider exposes NO thinking options for Haiku (verified models.ts:8-93); leave default."
+    },
+    "mimo-v2.5": {
+      "effort": "auto"
+    },
+    "mimo-v2.5-pro": {
+      "effort": "auto"
+    },
+    "minimax-m2.7": {
+      "effort": "auto"
+    },
+    "minimax-m2.5": {
+      "effort": "auto"
+    },
+    "qwen3.7-max": {
+      "effort": "auto"
+    },
+    "qwen3.7-plus": {
+      "effort": "auto"
+    },
+    "qwen3.6-plus": {
+      "effort": "auto"
+    },
+    "glm-5.1": {
+      "effort": "auto"
+    },
+    "glm-5": {
+      "effort": "auto"
+    },
+    "kimi-k2.6": {
+      "effort": "auto"
+    },
+    "kimi-k2.5": {
+      "effort": "auto"
+    },
+    "kimi-k2.7-code": {
+      "effort": "auto"
+    },
+    "qwen3.6-35b-a3b": {
+      "effort": "auto"
+    },
+    "qwen3.6-27b": {
+      "effort": "auto"
+    },
+    "deepseek-4-flash": {
+      "levels": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ],
+      "default": "high",
+      "by_difficulty": {
+        "simple": "low",
+        "standard": "high",
+        "hard": "max"
+      }
+    },
+    "qwen3.5-397b-a17b": {
+      "effort": "auto"
+    },
+    "qwen3-coder-flash": {
+      "effort": "auto"
+    },
+    "glm-4.7": {
+      "effort": "auto"
+    },
+    "glm-5-turbo": {
+      "effort": "auto"
+    },
+    "nemotron-3-ultra-550b": {
+      "effort": "auto"
+    },
+    "nemotron-3-super-120b": {
+      "effort": "auto"
+    },
+    "command-a": {
+      "effort": "auto"
+    }
+  },
+  "speed": {
+    "_note": "Relative responsiveness 0..1 (higher = faster, TTFT-oriented) used by --priority speed. ESTIMATES from model size/arch + vendor tok/s notes, NOT benchmarked on this stack; refine with measured TTFT when available. Mirrors DigitalOcean inference-router 'fastest' policy (selection by Time To First Token).",
+    "deepseek-v4-flash": 0.9,
+    "mimo-v2.5": 0.85,
+    "deepseek-v4-pro": 0.4,
+    "mimo-v2.5-pro": 0.45,
+    "minimax-m3": 0.6,
+    "minimax-m2.7": 0.8,
+    "minimax-m2.5": 0.8,
+    "qwen3.7-max": 0.4,
+    "qwen3.7-plus": 0.6,
+    "qwen3.6-plus": 0.55,
+    "glm-5.1": 0.45,
+    "glm-5": 0.5,
+    "kimi-k2.6": 0.55,
+    "kimi-k2.5": 0.55,
+    "kimi-k2.7-code": 0.6,
+    "qwen3.6-35b-a3b": 0.7,
+    "qwen3.6-27b": 0.6,
+    "sonnet": 0.7,
+    "haiku": 0.95,
+    "gpt-5.4": 0.55,
+    "gpt-5.1-mini": 0.85,
+    "deepseek-4-flash": 0.9,
+    "qwen3.5-397b-a17b": 0.45,
+    "qwen3-coder-flash": 0.85,
+    "glm-4.7": 0.55,
+    "glm-5-turbo": 0.7,
+    "nemotron-3-ultra-550b": 0.4,
+    "nemotron-3-super-120b": 0.55,
+    "command-a": 0.6
+  },
+  "fallback": {
+    "_note": "When a dispatched model fails, the orchestrator retries the next entry in the router's result.fallbacks chain ONLY for transient errors; on permanent errors it fails fast (retrying would just burn the chain). Match the provider error to these classes by status code or error name.",
+    "transient": [
+      "http_408",
+      "http_409",
+      "http_425",
+      "http_429",
+      "http_500",
+      "http_502",
+      "http_503",
+      "http_504",
+      "RateLimitError",
+      "APITimeoutError",
+      "APIConnectionError",
+      "InternalServerError",
+      "overloaded_error",
+      "ContextOverflowError"
+    ],
+    "permanent": [
+      "http_400",
+      "http_401",
+      "http_403",
+      "http_404",
+      "http_422",
+      "invalid_request_error",
+      "authentication_error",
+      "permission_error",
+      "not_found_error"
+    ]
+  },
+  "provider_priority": {
+    "_note": "Per-SOURCE routing bonus added to a candidate's score so that, among providers serving the same model, the preferred source wins; the fallback chain then fails over to the rest. Reflects Sam's cost posture 2026-06: spend the free DigitalOcean GitHub Student credits (~$160) FIRST, then cheap cloud (Reasonix, OpenRouter), then free local, with opencode-go DEPRIORITIZED (usage running low) but kept as a last-resort fallback. Source is classified from the provider string: digitalocean, openrouter, reasonix, opencode-zen (the free Zen models), local (sam-desktop ==..==), local-edge (embedding box ==edge-..==), opencode-go, subscription. Tune freely.",
+    "digitalocean": 35,
+    "reasonix": 32,
+    "openrouter": 28,
+    "opencode-zen": 25,
+    "local": 12,
+    "local-edge": 6,
+    "opencode-go": 20,
+    "subscription": 5
+  },
+  "permissions": {
+    "_note": "Permission/sandbox posture per Paseo backend, applied at create_agent. DEFAULT is bypass/yolo (fully unattended) per operator policy. Backend = the provider-string prefix before the first slash: claude, codex, opencode, reasonix. The router emits the bypass settings for the chosen provider's backend; paseo-boo passes settings.modeId/features to create_agent. Verified against paseo list_providers 2026-06 (isUnattended modes) plus fork source; CLI flags are for the standalone CLI path.",
+    "_default": "bypass",
+    "claude": {
+      "bypass": {
+        "modeId": "bypassPermissions"
+      },
+      "safe": {
+        "modeId": "default"
+      },
+      "readonly": {
+        "modeId": "plan"
+      },
+      "cli_bypass": "--dangerously-skip-permissions"
+    },
+    "claude-ib": {
+      "bypass": {
+        "modeId": "bypassPermissions"
+      },
+      "safe": {
+        "modeId": "default"
+      },
+      "readonly": {
+        "modeId": "plan"
+      },
+      "cli_bypass": "--dangerously-skip-permissions"
+    },
+    "codex": {
+      "bypass": {
+        "modeId": "full-access"
+      },
+      "safe": {
+        "modeId": "auto"
+      },
+      "readonly": null,
+      "cli_bypass": "--dangerously-bypass-approvals-and-sandbox (alias --yolo); --full-auto for workspace-write"
+    },
+    "opencode": {
+      "bypass": {
+        "modeId": "build",
+        "features": {
+          "auto_accept": true
+        }
+      },
+      "safe": {
+        "modeId": "build"
+      },
+      "readonly": {
+        "modeId": "plan"
+      },
+      "cli_bypass": "--dangerously-skip-permissions",
+      "_note": "build mode already defaults all tool permissions to allow (verified opencode agent.ts:106-164); residual asks are auto-approved by Paseo's create_agent features.auto_accept (a Paseo-layer feature, NOT an opencode config key). The standalone opencode CLI flag is --dangerously-skip-permissions (run.ts:231), which auto-approves ask results but still honors deny rules; there is no full bypass that overrides deny."
+    },
+    "reasonix": {
+      "bypass": {
+        "modeId": "yolo"
+      },
+      "safe": {
+        "modeId": "auto"
+      },
+      "readonly": {
+        "modeId": "plan"
+      },
+      "cli_bypass": "--mode yolo"
+    }
+  },
+  "pricing": {
+    "_note": "USD per 1M tokens, from Sam's 2026-06 pricing table. Primary cost tiebreaker when option-pool candidates fit comparably (output $/M dominates real cost). Local models (qwen3.6-*, diffusiongemma) are $0 self-host. _over_256k applies to the higher Qwen Plus context band.",
+    "glm-5.1": {
+      "input": 1.4,
+      "output": 4.4,
+      "cached_read": 0.26
+    },
+    "glm-5": {
+      "input": 1,
+      "output": 3.2,
+      "cached_read": 0.2
+    },
+    "kimi-k2.7-code": {
+      "input": 0.95,
+      "output": 4,
+      "cached_read": 0.19
+    },
+    "kimi-k2.6": {
+      "input": 0.95,
+      "output": 4,
+      "cached_read": 0.16
+    },
+    "kimi-k2.5": {
+      "input": 0.95,
+      "output": 4,
+      "cached_read": 0.16,
+      "_note": "not in the 2026-06 table; assumed equal to K2.6, confirm"
+    },
+    "mimo-v2.5": {
+      "input": 0.14,
+      "output": 0.28,
+      "cached_read": 0.0028
+    },
+    "mimo-v2.5-pro": {
+      "input": 1.74,
+      "output": 3.48,
+      "cached_read": 0.0145
+    },
+    "minimax-m3": {
+      "input": 0.3,
+      "output": 1.2,
+      "cached_read": 0.06,
+      "usage_value_multiplier": 3,
+      "effective_input": 0.1,
+      "effective_output": 0.4,
+      "_note": "3x usage VALUE in effect NOW: 3x the tokens per dollar, so effective cost is one-third of list (~$0.10 in / ~$0.40 out). Router should cost M3 at the effective_* values; this makes it the CHEAPEST mid model currently. Drop the multiplier when the promo ends."
+    },
+    "minimax-m2.7": {
+      "input": 0.3,
+      "output": 1.2,
+      "cached_read": 0.06,
+      "cached_write": 0.375
+    },
+    "minimax-m2.5": {
+      "input": 0.3,
+      "output": 1.2,
+      "cached_read": 0.06,
+      "cached_write": 0.375
+    },
+    "qwen3.7-max": {
+      "input": 2.5,
+      "output": 7.5,
+      "cached_read": 0.5,
+      "cached_write": 3.125
+    },
+    "qwen3.7-plus": {
+      "input": 0.4,
+      "output": 1.6,
+      "cached_read": 0.04,
+      "cached_write": 0.5,
+      "_over_256k": {
+        "input": 1.2,
+        "output": 4.8,
+        "cached_read": 0.12,
+        "cached_write": 1.5
+      }
+    },
+    "qwen3.6-plus": {
+      "input": 0.5,
+      "output": 3,
+      "cached_read": 0.05,
+      "cached_write": 0.625,
+      "_over_256k": {
+        "input": 2,
+        "output": 6,
+        "cached_read": 0.2,
+        "cached_write": 2.5
+      }
+    },
+    "deepseek-v4-pro": {
+      "input": 0.435,
+      "output": 0.87,
+      "cached_read": 0.0036,
+      "_note": "Native DeepSeek API price (verified 2026-06; matches reasonix.example.toml prices block); the opencode-go/fireworks route was $1.74/$3.48. deepseek-v4-* now route via the Reasonix provider (reasonix/deepseek-pro/deepseek-v4-pro), which uses the same DeepSeek API and price."
+    },
+    "deepseek-v4-flash": {
+      "input": 0.14,
+      "output": 0.28,
+      "cached_read": 0.0028
+    },
+    "qwen3.6-35b-a3b": {
+      "input": 0,
+      "output": 0,
+      "_note": "local $0 self-host"
+    },
+    "qwen3.6-27b": {
+      "input": 0,
+      "output": 0,
+      "_note": "local $0 self-host"
+    },
+    "opus": {
+      "input": 5,
+      "output": 25,
+      "_ctx": "1M default",
+      "_note": "S-tier; subscription/off-API; never subagent"
+    },
+    "gpt-5.5": {
+      "input": 5,
+      "output": 30,
+      "_ctx": "1M, 128K out",
+      "_note": "S-tier; not yet API-key routable in Codex"
+    },
+    "gpt-5.4": {
+      "input": 2.5,
+      "output": 30,
+      "_ctx": "1M",
+      "_note": "A-tier"
+    },
+    "sonnet": {
+      "input": 3,
+      "output": 15,
+      "_ctx": "256K (1M not auto-upgraded, costs credits)",
+      "_note": "A-tier"
+    },
+    "haiku": {
+      "input": 1,
+      "output": 5,
+      "_ctx": "200K",
+      "_note": "B-tier; tier-list draft said $1/$15, using strength-sheet $1/$5, CONFIRM"
+    },
+    "gpt-5.1-mini": {
+      "input": 0.75,
+      "output": 4.5,
+      "_ctx": "400K",
+      "_note": "B-tier"
+    }
+  }
+}

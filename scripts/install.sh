@@ -95,6 +95,10 @@ for skill_md in "$REPO_DIR/skills/"*/SKILL.md; do
     create_link "$skill_dir" "$HOME/.codex/skills/$name" "codex-skill:$name"
 done
 
+# Presets + registry: regenerate Pi/OMP orchestration JSON, install CLIs, seed ~/.paseo.
+echo "--- Installing presets and model registry ---"
+bash "$REPO_DIR/scripts/seed-presets.sh"
+
 # Model router: stable CLI path for the boo-router skill and the grade presets.
 # The skill also bundles scripts/router.mjs as a symlink, but a fixed path under
 # ~/.paseo/bin matches paseo-preset / apply-agent-models and is callable directly.
