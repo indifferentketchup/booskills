@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PRESETS_DIR="${PASEO_PRESETS_DIR:-$HOME/.paseo/presets}"
+ACTIVE="${PASEO_ACTIVE_PRESET:-$HOME/.paseo/orchestration-preferences.json}"
+REPO_PRESETS="$REPO_DIR/presets"
+
+install_presets_if_missing() {
+  if [ -d "$REPO_PRESETS" ] && [ -n "$(ls -A "$REPO_PRESETS"/*.json 2>/dev/null || true)" ]; then
+    mkdir -p "$PRESETS_DIR"
+    if [ -z "$(ls -A "$PRESETS_DIR"/*.json 2>/dev/null || true)" ]; then
+      cp "$REPO_PRESETS"/*.json "$PRESETS_DIR/"
+    fi
+  fi
+}
+
+list_presets() {
+  install_presets_if_missing
+  if [ ! -d "$PRESETS_DIR" ]; then
+    echo "No presets directory at $PRESETS_DIR"
+    echo "Run: bash $REPO_DIR/scripts/seed-presets.sh"
+    exit 1
+  fi
+  active_name=""
+  if [ -f "$ACTIVE" ]; then
+    active_name="$(python3 - "$ACTIVE" <<'PY'
+import json, sys
+try:
+    print(json.load(open(sys.argv[1])).get("preset", ""))
+except Exception:
+    pass
+PY
+)"
+  fi
+  echo "Presets in $PRESETS_DIR:"
+  for f in "$PRESETS_DIR"/*.json; do
+    [ -f "$f" ] || continue
+    base="$(basename "$f" .json)"
+    if [ "$base" = "$active_name" ]; then
+      echo "  * $base  (active)"
+    else
+      echo "    $base"
+    fi
+  done
+  echo ""
+  if [ -n "$active_name" ]; then
+    echo "Active file: $ACTIVE"
+  else
+    echo "No active preset at $ACTIVE"
+  fi
+}
+
+activate_preset() {
+  local name="$1"
+  install_presets_if_missing
+  local src="$PRESETS_DIR/${name}.json"
+  if [ ! -f "$src" ]; then
+    echo "Unknown preset: $name" >&2
+    exit 1
+  fi
+  mkdir -p "$(dirname "$ACTIVE")"
+  python3 - "$src" "$ACTIVE" "$name" <<'PY'
+import json, sys
+src, active, name = sys.argv[1:4]
+obj = json.load(open(src))
+obj["preset"] = name
+with open(active, "w", encoding="utf-8") as fh:
+    json.dump(obj, fh, indent=2)
+    fh.write("\n")
+print(f"Activated preset: {name}")
+print(f"Wrote: {active}")
+PY
+  if [ -x "$REPO_DIR/scripts/omp-preset" ]; then
+    bash "$REPO_DIR/scripts/omp-preset" --from-active
+  fi
+  if [ -x "$REPO_DIR/scripts/apply-agent-models.sh" ]; then
+    bash "$REPO_DIR/scripts/apply-agent-models.sh"
+  fi
+}
+
+case "${1:-}" in
+  ""|-h|--help) list_presets ;;
+  *) activate_preset "$1" ;;
+esac

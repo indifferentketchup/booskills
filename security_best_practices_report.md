@@ -167,7 +167,7 @@ When a codex skill collision is detected (line 89-93), the outer `continue` skip
 
 **Location:** `model-router/router.mjs:431-434`
 
-`{ ...args, ... }` copies `dryRunSamples: true` into every sample object. More practically, samples hardcode `presetPath` to `~/.paseo/presets/workhorse-mid.json`  --  if this file does not exist, `--dry-run-samples` throws a filesystem error with no diagnostic message.
+`{ ...args, ... }` copies `dryRunSamples: true` into every sample object. More practically, samples hardcode `presetPath` to `~/.paseo/presets/workhorse.json`  --  if this file does not exist, `--dry-run-samples` throws a filesystem error with no diagnostic message.
 
 ---
 

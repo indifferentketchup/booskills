@@ -1,0 +1,83 @@
+{
+  "preset": "grade-A",
+  "concurrency": 4,
+  "preferences": [
+    "Sam reviews all diffs and commits manually. Agents must not commit. Stage by explicit path, never git add -A.",
+    "Prefer minimal scope; lead with the smallest approach.",
+    "Subscription-high models (opus, fable, gpt-5, gpt-5.5) are preset pool options for the router but must never be assigned in the agents map or routed as subagents.",
+    "Local llama-swap: only one local model resident at a time. When concurrency is 1, dispatch subagents strictly one at a time.",
+    "Default cloud posture: DeepSeek V4 Flash and MiMo 2.5 for bulk work; MiniMax M3 and grade-B models for mid-tier; grade-A/S for explicit quality needs.",
+    "Provider strings use Pi/OMP format (provider/model). Gateway models list both openrouter/ and kilo/ variants; OMP coalesces inside sessions."
+  ],
+  "providers": {
+    "impl": [
+      "openrouter/qwen/qwen3.7-plus",
+      "kilo/qwen/qwen3.7-plus",
+      "openrouter/moonshotai/kimi-k2.6",
+      "kilo/moonshotai/kimi-k2.6",
+      "openrouter/z-ai/glm-5",
+      "kilo/z-ai/glm-5",
+      "anthropic/claude-sonnet-4-6",
+      "openai-codex/gpt-5.4",
+      "cursor/composer-1.5"
+    ],
+    "ui": [
+      "openrouter/qwen/qwen3.7-plus",
+      "kilo/qwen/qwen3.7-plus",
+      "openrouter/moonshotai/kimi-k2.6",
+      "kilo/moonshotai/kimi-k2.6",
+      "openrouter/z-ai/glm-5",
+      "kilo/z-ai/glm-5",
+      "anthropic/claude-sonnet-4-6",
+      "openai-codex/gpt-5.4",
+      "cursor/composer-1.5"
+    ],
+    "audit": [
+      "openrouter/qwen/qwen3.7-plus",
+      "kilo/qwen/qwen3.7-plus",
+      "openrouter/moonshotai/kimi-k2.6",
+      "kilo/moonshotai/kimi-k2.6",
+      "openrouter/z-ai/glm-5",
+      "kilo/z-ai/glm-5",
+      "anthropic/claude-sonnet-4-6",
+      "openai-codex/gpt-5.4",
+      "cursor/composer-1.5"
+    ],
+    "research": [
+      "openrouter/qwen/qwen3.7-plus",
+      "kilo/qwen/qwen3.7-plus",
+      "openrouter/moonshotai/kimi-k2.6",
+      "kilo/moonshotai/kimi-k2.6",
+      "openrouter/z-ai/glm-5",
+      "kilo/z-ai/glm-5",
+      "anthropic/claude-sonnet-4-6",
+      "openai-codex/gpt-5.4",
+      "cursor/composer-1.5"
+    ],
+    "planning": [
+      "openrouter/qwen/qwen3.7-plus",
+      "kilo/qwen/qwen3.7-plus",
+      "openrouter/moonshotai/kimi-k2.6",
+      "kilo/moonshotai/kimi-k2.6",
+      "openrouter/z-ai/glm-5",
+      "kilo/z-ai/glm-5",
+      "anthropic/claude-sonnet-4-6",
+      "openai-codex/gpt-5.4",
+      "cursor/composer-1.5"
+    ]
+  },
+  "agents": {
+    "adversarial-security-analyst": "deepseek/deepseek-v4-flash",
+    "adversarial-validator": "openrouter/xiaomi/mimo-v2.5",
+    "behavioral-analyst": "openrouter/xiaomi/mimo-v2.5",
+    "concurrency-analyst": "deepseek/deepseek-v4-flash",
+    "edge-case-explorer": "openrouter/xiaomi/mimo-v2.5",
+    "evidence-based-investigator": "openrouter/xiaomi/mimo-v2.5",
+    "junior-developer": "deepseek/deepseek-v4-flash",
+    "risk-analyst": "deepseek/deepseek-v4-flash",
+    "software-architect": "openrouter/z-ai/glm-5",
+    "structural-analyst": "openrouter/xiaomi/mimo-v2.5",
+    "test-engineer": "deepseek/deepseek-v4-flash",
+    "user-experience-designer": "cursor/composer-2.5"
+  }
+}

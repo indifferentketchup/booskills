@@ -1,0 +1,52 @@
+{
+  "preset": "grade-F",
+  "concurrency": 1,
+  "preferences": [
+    "Sam reviews all diffs and commits manually. Agents must not commit. Stage by explicit path, never git add -A.",
+    "Prefer minimal scope; lead with the smallest approach.",
+    "Subscription-high models (opus, fable, gpt-5, gpt-5.5) are preset pool options for the router but must never be assigned in the agents map or routed as subagents.",
+    "Local llama-swap: only one local model resident at a time. When concurrency is 1, dispatch subagents strictly one at a time.",
+    "Local models are $0 but serial on a single llama-swap server; never fan out parallel subagents on local-heavy presets."
+  ],
+  "providers": {
+    "impl": [
+      "llama-swap/embed",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+    ],
+    "ui": [
+      "llama-swap/embed",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+    ],
+    "audit": [
+      "llama-swap/embed",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+    ],
+    "research": [
+      "llama-swap/embed",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+    ],
+    "planning": [
+      "llama-swap/embed",
+      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+    ]
+  },
+  "agents": {
+    "adversarial-security-analyst": "llama-swap/qwen3.6-35b-a3b",
+    "adversarial-validator": "llama-swap/qwen3.6-27b",
+    "behavioral-analyst": "llama-swap/qwen3.6-35b-a3b",
+    "concurrency-analyst": "llama-swap/qwen3.6-35b-a3b",
+    "edge-case-explorer": "llama-swap/qwen3.6-27b",
+    "evidence-based-investigator": "llama-swap/qwen3.6-35b-a3b",
+    "junior-developer": "llama-swap/qwen3.6-27b",
+    "risk-analyst": "llama-swap/qwen3.6-35b-a3b",
+    "software-architect": "llama-swap/qwen3.6-35b-a3b",
+    "structural-analyst": "llama-swap/qwen3.6-27b",
+    "test-engineer": "llama-swap/qwen3.6-27b",
+    "user-experience-designer": "llama-swap/qwen3.6-35b-a3b"
+  }
+}

@@ -3,7 +3,7 @@
 # preset into the installed OpenCode agent files.
 #
 # Source of truth: the "agents" map in ~/.paseo/orchestration-preferences.json
-# (agent-name -> opencode model id, e.g. "opencode-go/mimo-v2.5").
+# (agent-name -> provider/model id, e.g. "deepseek/deepseek-v4-flash").
 # Canonical personas: <repo>/agents/opencode/<name>.md (no model field).
 # Output: ~/.config/opencode/agents/<name>.md as a GENERATED COPY with a
 # model: line inserted. Generated copies replace the install symlinks on
@@ -36,7 +36,7 @@ def fail(msg):
 
 
 def model_key(model_id):
-    """Last path segment, lowercased: 'opencode/opencode-go/mimo-v2.5' -> 'mimo-v2.5'."""
+    """Last path segment, lowercased: 'openrouter/xiaomi/mimo-v2.5' -> 'mimo-v2.5'."""
     return str(model_id).strip().split("/")[-1].lower()
 
 

@@ -6,15 +6,18 @@ import Presets from "./Presets";
 
 function sourceOf(p) {
   const s = String(p || "");
+  if (s.startsWith("deepseek/")) return "deepseek";
+  if (s.startsWith("kilo/")) return "kilo";
   if (s.includes("digitalocean")) return "digitalocean";
   if (s.includes("openrouter")) return "openrouter";
   if (s.startsWith("reasonix/")) return "reasonix";
+  if (s.startsWith("llama-swap/")) return "local";
   if (s.includes("==edge-")) return "local-edge";
   if (s.includes("==")) return "local";
   if (s.includes("opencode-go/")) return "opencode-go";
-  if (s.startsWith("claude/") || s.startsWith("codex/")) return "subscription";
+  if (s.startsWith("anthropic/") || s.startsWith("claude/") || s.startsWith("codex/") || s.startsWith("openai-codex/") || s.startsWith("cursor/") || s.startsWith("google-antigravity/")) return "subscription";
   if (s.includes("opencode/opencode/") || s.endsWith("-free")) return "opencode-zen";
-  return "subscription";
+  return "other";
 }
 const SOURCE_LABEL = {
   digitalocean: "DigitalOcean", reasonix: "Reasonix", openrouter: "OpenRouter",
@@ -83,7 +86,7 @@ function Meta({ k, v }) {
 /*  Playground tab                                                     */
 /* ------------------------------------------------------------------ */
 function Playground({ opts }) {
-  const [form, setForm] = useState({ preset: "credits-first", role: "impl", priority: "balanced", difficulty: "standard", task: "", contextTokens: 0, requires: "", fanout: 1, residentLocal: "" });
+  const [form, setForm] = useState({ preset: "workhorse", role: "impl", priority: "balanced", difficulty: "standard", task: "", contextTokens: 0, requires: "", fanout: 1, residentLocal: "" });
   const [state, setState] = useState("idle");
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -109,7 +112,7 @@ function Playground({ opts }) {
     <div className="grid">
       <form className="panel form" onSubmit={run}>
         <div className="row">
-          <Field label="Preset"><select value={form.preset} onChange={set("preset")}>{(opts?.presets || ["credits-first"]).map((p) => <option key={p} value={p}>{p}</option>)}</select></Field>
+          <Field label="Preset"><select value={form.preset} onChange={set("preset")}>{(opts?.presets || ["workhorse"]).map((p) => <option key={p} value={p}>{p}</option>)}</select></Field>
           <Field label="Role"><select value={form.role} onChange={set("role")}>{(opts?.roles || ["impl"]).map((p) => <option key={p} value={p}>{p}</option>)}</select></Field>
         </div>
         <div className="row">
