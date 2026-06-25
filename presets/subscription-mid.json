@@ -7,7 +7,7 @@
     "Subscription-high models (opus, fable, gpt-5, gpt-5.5) are preset pool options for the router but must never be assigned in the agents map or routed as subagents.",
     "Local llama-swap: only one local model resident at a time. When concurrency is 1, dispatch subagents strictly one at a time.",
     "Default cloud posture: DeepSeek V4 Flash and MiMo 2.5 for bulk work; MiniMax M3 and grade-B models for mid-tier; grade-A/S for explicit quality needs.",
-    "Provider strings use Pi/OMP format (provider/model). Gateway models list both openrouter/ and kilo/ variants; OMP coalesces inside sessions."
+    "Provider strings use Pi/OMP format (provider/model). Cloud gateway models route via litellm/ (LiteLLM proxy); native Anthropic/OpenAI-Codex/Cursor/Gemini stay direct."
   ],
   "providers": {
     "impl": [

@@ -70,7 +70,7 @@ Control panel at `http://localhost:3000` with Playground, Load dashboard, Provid
 | `subscription-mid` | A | GPT-5.4 + Sonnet |
 
 All presets use array pools  --  the orchestrator picks by situation via the model-router.
-Provider strings are Pi/OMP `provider/model` format (DeepSeek direct, openrouter/kilo dual pools, llama-swap local, native Anthropic/OpenAI-Codex/Cursor/Gemini).
+Provider strings are Pi/OMP `provider/model` format (cloud gateway models via `litellm/` LiteLLM proxy, llama-swap local, native Anthropic/OpenAI-Codex/Cursor/Gemini).
 
 Regenerate and install presets after editing `scripts/generate-presets.py`:
 

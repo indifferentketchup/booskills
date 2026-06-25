@@ -11,28 +11,23 @@
   "providers": {
     "impl": [
       "llama-swap/embed",
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free"
     ],
     "ui": [
       "llama-swap/embed",
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free"
     ],
     "audit": [
       "llama-swap/embed",
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free"
     ],
     "research": [
       "llama-swap/embed",
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free"
     ],
     "planning": [
       "llama-swap/embed",
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free"
     ]
   },
   "agents": {
