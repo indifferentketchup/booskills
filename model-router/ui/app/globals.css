@@ -42,6 +42,9 @@
   --bad:    oklch(0.62 0.20 27);
   --bad-wash: oklch(0.22 0.06 27);
 
+  --p-litellm:       oklch(0.70 0.16 175);
+  --p-deepseek:      oklch(0.68 0.14 220);
+  --p-kilo:          oklch(0.68 0.14 280);
   --p-digitalocean:  oklch(0.68 0.18 250);
   --p-reasonix:      oklch(0.68 0.19 295);
   --p-openrouter:    oklch(0.68 0.15 200);

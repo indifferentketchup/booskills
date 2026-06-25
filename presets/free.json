@@ -7,62 +7,47 @@
     "Subscription-high models (opus, fable, gpt-5, gpt-5.5) are preset pool options for the router but must never be assigned in the agents map or routed as subagents.",
     "Local llama-swap: only one local model resident at a time. When concurrency is 1, dispatch subagents strictly one at a time.",
     "Default cloud posture: DeepSeek V4 Flash and MiMo 2.5 for bulk work; MiniMax M3 and grade-B models for mid-tier; grade-A/S for explicit quality needs.",
-    "Provider strings use Pi/OMP format (provider/model). Gateway models list both openrouter/ and kilo/ variants; OMP coalesces inside sessions."
+    "Provider strings use Pi/OMP format (provider/model). Cloud gateway models route via litellm/ (LiteLLM proxy); native Anthropic/OpenAI-Codex/Cursor/Gemini stay direct."
   ],
   "providers": {
     "impl": [
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "openrouter/minimax/minimax-m2.5:free",
-      "kilo/minimax/minimax-m2.5:free",
-      "openrouter/stepfun/step-3.7-flash:free",
-      "kilo/stepfun/step-3.7-flash:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "litellm/openrouter/minimax/minimax-m2.5:free",
+      "litellm/openrouter/stepfun/step-3.7-flash:free"
     ],
     "ui": [
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "openrouter/minimax/minimax-m2.5:free",
-      "kilo/minimax/minimax-m2.5:free",
-      "openrouter/stepfun/step-3.7-flash:free",
-      "kilo/stepfun/step-3.7-flash:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "litellm/openrouter/minimax/minimax-m2.5:free",
+      "litellm/openrouter/stepfun/step-3.7-flash:free"
     ],
     "audit": [
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "openrouter/minimax/minimax-m2.5:free",
-      "kilo/minimax/minimax-m2.5:free",
-      "openrouter/stepfun/step-3.7-flash:free",
-      "kilo/stepfun/step-3.7-flash:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "litellm/openrouter/minimax/minimax-m2.5:free",
+      "litellm/openrouter/stepfun/step-3.7-flash:free"
     ],
     "research": [
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "openrouter/minimax/minimax-m2.5:free",
-      "kilo/minimax/minimax-m2.5:free",
-      "openrouter/stepfun/step-3.7-flash:free",
-      "kilo/stepfun/step-3.7-flash:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "litellm/openrouter/minimax/minimax-m2.5:free",
+      "litellm/openrouter/stepfun/step-3.7-flash:free"
     ],
     "planning": [
-      "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kilo/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "openrouter/minimax/minimax-m2.5:free",
-      "kilo/minimax/minimax-m2.5:free",
-      "openrouter/stepfun/step-3.7-flash:free",
-      "kilo/stepfun/step-3.7-flash:free"
+      "litellm/openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "litellm/openrouter/minimax/minimax-m2.5:free",
+      "litellm/openrouter/stepfun/step-3.7-flash:free"
     ]
   },
   "agents": {
-    "adversarial-security-analyst": "deepseek/deepseek-v4-flash",
-    "adversarial-validator": "openrouter/xiaomi/mimo-v2.5",
-    "behavioral-analyst": "openrouter/xiaomi/mimo-v2.5",
-    "concurrency-analyst": "deepseek/deepseek-v4-flash",
-    "edge-case-explorer": "openrouter/xiaomi/mimo-v2.5",
-    "evidence-based-investigator": "openrouter/xiaomi/mimo-v2.5",
-    "junior-developer": "deepseek/deepseek-v4-flash",
-    "risk-analyst": "deepseek/deepseek-v4-flash",
-    "software-architect": "openrouter/z-ai/glm-5",
-    "structural-analyst": "openrouter/xiaomi/mimo-v2.5",
-    "test-engineer": "deepseek/deepseek-v4-flash",
+    "adversarial-security-analyst": "litellm/deepseek/deepseek-v4-flash",
+    "adversarial-validator": "litellm/openrouter/xiaomi/mimo-v2.5",
+    "behavioral-analyst": "litellm/openrouter/xiaomi/mimo-v2.5",
+    "concurrency-analyst": "litellm/deepseek/deepseek-v4-flash",
+    "edge-case-explorer": "litellm/openrouter/xiaomi/mimo-v2.5",
+    "evidence-based-investigator": "litellm/openrouter/xiaomi/mimo-v2.5",
+    "junior-developer": "litellm/deepseek/deepseek-v4-flash",
+    "risk-analyst": "litellm/deepseek/deepseek-v4-flash",
+    "software-architect": "litellm/openrouter/z-ai/glm-5",
+    "structural-analyst": "litellm/openrouter/xiaomi/mimo-v2.5",
+    "test-engineer": "litellm/deepseek/deepseek-v4-flash",
     "user-experience-designer": "cursor/composer-2.5"
   }
 }

@@ -39,9 +39,9 @@ def first(*values):
         if v: return v
     return None
 
-def prefer_openrouter(pool):
+def prefer_litellm(pool):
     for e in pool:
-        if e.startswith("openrouter/"): return e
+        if e.startswith("litellm/"): return e
     return pool[0] if pool else None
 
 def find_prefix(pool, prefix):
@@ -49,8 +49,8 @@ def find_prefix(pool, prefix):
         if prefix in e: return e
     return None
 
-roles = {"default": first(find_prefix(impl, "deepseek/"), agents.get("junior-developer"), impl[0] if impl else None),
-         "task": first(agents.get("evidence-based-investigator"), prefer_openrouter(impl))}
+roles = {"default": first(find_prefix(impl, "litellm/deepseek/"), agents.get("junior-developer"), impl[0] if impl else None),
+         "task": first(agents.get("evidence-based-investigator"), prefer_litellm(impl))}
 roles["smol"] = roles["task"]
 plan = first(agents.get("software-architect"), find_prefix(planning, "glm-5"), find_prefix(impl, "glm-5"))
 if plan: roles["plan"] = plan

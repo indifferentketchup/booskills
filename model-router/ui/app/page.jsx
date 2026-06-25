@@ -6,6 +6,7 @@ import Presets from "./Presets";
 
 function sourceOf(p) {
   const s = String(p || "");
+  if (s.startsWith("litellm/")) return "litellm";
   if (s.startsWith("deepseek/")) return "deepseek";
   if (s.startsWith("kilo/")) return "kilo";
   if (s.includes("digitalocean")) return "digitalocean";
@@ -20,7 +21,7 @@ function sourceOf(p) {
   return "other";
 }
 const SOURCE_LABEL = {
-  digitalocean: "DigitalOcean", reasonix: "Reasonix", openrouter: "OpenRouter",
+  litellm: "LiteLLM", deepseek: "DeepSeek", kilo: "Kilo", digitalocean: "DigitalOcean", reasonix: "Reasonix", openrouter: "OpenRouter",
   "opencode-zen": "OpenCode Zen", local: "Local", "local-edge": "Local edge",
   "opencode-go": "OpenCode Go", subscription: "Subscription",
 };

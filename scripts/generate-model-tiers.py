@@ -14,19 +14,19 @@ OUT_HOME = Path(os.environ.get("PASEO_MODEL_TIERS", Path.home() / ".paseo" / "mo
 OUT_REPO = REPO / "model-registry" / "model-tiers.json"
 
 GATEWAY: dict[str, str] = {
-    "mimo-v2.5": "openrouter/xiaomi/mimo-v2.5",
-    "mimo-v2.5-pro": "openrouter/xiaomi/mimo-v2.5-pro",
-    "minimax-m3": "openrouter/minimax/minimax-m3",
-    "minimax-m2.7": "openrouter/minimax/minimax-m2.7",
-    "minimax-m2.5": "openrouter/minimax/minimax-m2.5",
-    "qwen3.7-plus": "openrouter/qwen/qwen3.7-plus",
-    "qwen3.7-max": "openrouter/qwen/qwen3.7-max",
-    "qwen3.6-plus": "openrouter/qwen/qwen3.6-plus",
-    "glm-5": "openrouter/z-ai/glm-5",
-    "glm-5.1": "openrouter/z-ai/glm-5.1",
-    "kimi-k2.6": "openrouter/moonshotai/kimi-k2.6",
-    "kimi-k2.5": "openrouter/moonshotai/kimi-k2.5",
-    "kimi-k2.7-code": "openrouter/moonshotai/kimi-k2.7-code",
+    "mimo-v2.5": "litellm/openrouter/xiaomi/mimo-v2.5",
+    "mimo-v2.5-pro": "litellm/openrouter/xiaomi/mimo-v2.5-pro",
+    "minimax-m3": "litellm/minimax-m3",
+    "minimax-m2.7": "litellm/minimax-m2.7",
+    "minimax-m2.5": "litellm/openrouter/minimax/minimax-m2.5",
+    "qwen3.7-plus": "litellm/openrouter/qwen/qwen3.7-plus",
+    "qwen3.7-max": "litellm/openrouter/qwen/qwen3.7-max",
+    "qwen3.6-plus": "litellm/openrouter/qwen/qwen3.6-plus",
+    "glm-5": "litellm/openrouter/z-ai/glm-5",
+    "glm-5.1": "litellm/openrouter/z-ai/glm-5.2",
+    "kimi-k2.6": "litellm/moonshot/kimi-k2.6",
+    "kimi-k2.5": "litellm/moonshot/kimi-k2.5",
+    "kimi-k2.7-code": "litellm/moonshot/kimi-k2.7-code",
 }
 
 CLAUDE_PI = {
@@ -151,14 +151,22 @@ EXTRA_ATTRIBUTES: dict[str, dict] = {
 
 def remap_tier_provider(entry: str) -> str:
     s = str(entry)
+    if s.startswith("litellm/"):
+        return s
     if s.startswith("opencode-go/"):
         slug = s.split("/", 1)[1]
-        return GATEWAY.get(slug, f"openrouter/{slug}")
+        return GATEWAY.get(slug, f"litellm/openrouter/{slug}")
     if s.startswith("reasonix/"):
         if "deepseek-v4-flash" in s:
-            return "deepseek/deepseek-v4-flash"
+            return "litellm/deepseek/deepseek-v4-flash"
         if "deepseek-v4-pro" in s:
-            return "deepseek/deepseek-v4-pro"
+            return "litellm/deepseek/deepseek-v4-pro"
+    if s.startswith("deepseek/"):
+        return f"litellm/{s}"
+    if s.startswith("openrouter/"):
+        return f"litellm/{s}"
+    if s.startswith("kilo/"):
+        return f"litellm/openrouter/{s.split('/', 1)[1]}"
     if s.startswith("==qwen==/"):
         return f"llama-swap/{s.split('/', 1)[1]}"
     if s.startswith("codex/"):
@@ -210,9 +218,10 @@ def patch_provider_priority(registry: dict) -> None:
     registry["provider_priority"] = {
         "_note": (
             "Per-source score bonus for Pi/OMP provider strings (2026-06). "
-            "deepseek direct API first, then kilo, openrouter, local llama-swap, "
+            "litellm proxy first, then legacy direct deepseek/kilo/openrouter, local llama-swap, "
             "native subscriptions, gateway :free variants; opencode-go kept as legacy fallback."
         ),
+        "litellm": 42,
         "deepseek": 38,
         "kilo": 34,
         "openrouter": 30,

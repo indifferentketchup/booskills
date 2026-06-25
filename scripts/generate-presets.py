@@ -26,13 +26,9 @@ PERSONAS = (
 )
 
 
-def gw(model: str) -> list[str]:
-    """Dual-gateway pool: OpenRouter + Kilo."""
-    return [f"openrouter/{model}", f"kilo/{model}"]
-
-
-def deepseek(suffix: str) -> str:
-    return f"deepseek/deepseek-v4-{suffix}"
+def litellm(route: str) -> str:
+    """Route via OMP LiteLLM proxy (LITELLM_BASE_URL). Gemini/google excluded."""
+    return f"litellm/{route}"
 
 
 def anthropic(model: str) -> str:
@@ -65,38 +61,38 @@ def pool(*entries: str | list[str]) -> list[str]:
     return out
 
 
-# Values are provider strings or dual-gateway lists.
+# Cloud gateway models route through litellm/ (single LiteLLM proxy pool).
 M: dict[str, str | list[str]] = {
-    "mimo-v2.5-pro": gw("xiaomi/mimo-v2.5-pro"),
-    "glm-5.1": gw("z-ai/glm-5.1"),
-    "qwen3.7-max": gw("qwen/qwen3.7-max"),
+    "mimo-v2.5-pro": litellm("openrouter/xiaomi/mimo-v2.5-pro"),
+    "glm-5.1": litellm("openrouter/z-ai/glm-5.2"),
+    "qwen3.7-max": litellm("openrouter/qwen/qwen3.7-max"),
     "gpt-5.5": openai_codex("gpt-5.5"),
     "opus": anthropic("claude-opus-4-8"),
     "fable": anthropic("claude-fable-5"),
     "composer-2.5": cursor("composer-2.5"),
     "gemini-3.1-pro": gemini("gemini-3.1-pro"),
-    "deepseek-v4-pro": deepseek("pro"),
-    "qwen3.7-plus": gw("qwen/qwen3.7-plus"),
-    "kimi-k2.6": gw("moonshotai/kimi-k2.6"),
-    "glm-5": gw("z-ai/glm-5"),
+    "deepseek-v4-pro": litellm("deepseek/deepseek-v4-pro"),
+    "qwen3.7-plus": litellm("openrouter/qwen/qwen3.7-plus"),
+    "kimi-k2.6": litellm("moonshot/kimi-k2.6"),
+    "glm-5": litellm("openrouter/z-ai/glm-5"),
     "sonnet": anthropic("claude-sonnet-4-6"),
     "gpt-5.4": openai_codex("gpt-5.4"),
     "composer-1.5": cursor("composer-1.5"),
-    "minimax-m3": gw("minimax/minimax-m3"),
+    "minimax-m3": litellm("minimax-m3"),
     "haiku": anthropic("claude-haiku-4-5"),
     "gpt-5.1-mini": openai_codex("gpt-5.1-codex-mini"),
-    "laguna-m.1": gw("poolside/laguna-m.1"),
-    "owl-alpha": gw("openrouter/owl-alpha"),
-    "step-3.7-flash": gw("stepfun/step-3.7-flash"),
-    "mimo-v2.5": gw("xiaomi/mimo-v2.5"),
-    "deepseek-v4-flash": deepseek("flash"),
+    "laguna-m.1": litellm("laguna-m.1"),
+    "owl-alpha": litellm("openrouter/owl-alpha"),
+    "step-3.7-flash": litellm("openrouter/stepfun/step-3.7-flash"),
+    "mimo-v2.5": litellm("openrouter/xiaomi/mimo-v2.5"),
+    "deepseek-v4-flash": litellm("deepseek/deepseek-v4-flash"),
     "qwen3.6-35b-a3b": local("qwen3.6-35b-a3b"),
     "qwen3.6-27b": local("qwen3.6-27b"),
     "nemotron-cascade-30b": local("nemotron-cascade-2-30b-a3b"),
     "qwen3.5-9b": local("qwen3.5-9b"),
-    "nemotron-3-ultra-free": gw("nvidia/nemotron-3-ultra-550b-a55b:free"),
-    "minimax-m2.5-free": gw("minimax/minimax-m2.5:free"),
-    "step-3.7-flash-free": gw("stepfun/step-3.7-flash:free"),
+    "nemotron-3-ultra-free": litellm("openrouter/nvidia/nemotron-3-ultra-550b-a55b:free"),
+    "minimax-m2.5-free": litellm("openrouter/minimax/minimax-m2.5:free"),
+    "step-3.7-flash-free": litellm("openrouter/stepfun/step-3.7-flash:free"),
     "local-embed": local("embed"),
 }
 
@@ -162,21 +158,21 @@ LOCAL_PREFERENCES = BASE_PREFERENCES + [
 
 CLOUD_PREFERENCES = BASE_PREFERENCES + [
     "Default cloud posture: DeepSeek V4 Flash and MiMo 2.5 for bulk work; MiniMax M3 and grade-B models for mid-tier; grade-A/S for explicit quality needs.",
-    "Provider strings use Pi/OMP format (provider/model). Gateway models list both openrouter/ and kilo/ variants; OMP coalesces inside sessions.",
+    "Provider strings use Pi/OMP format (provider/model). Cloud gateway models route via litellm/ (LiteLLM proxy); native Anthropic/OpenAI-Codex/Cursor/Gemini stay direct.",
 ]
 
 DEFAULT_AGENTS_CLOUD = {
-    "adversarial-security-analyst": deepseek("flash"),
-    "adversarial-validator": "openrouter/xiaomi/mimo-v2.5",
-    "behavioral-analyst": "openrouter/xiaomi/mimo-v2.5",
-    "concurrency-analyst": deepseek("flash"),
-    "edge-case-explorer": "openrouter/xiaomi/mimo-v2.5",
-    "evidence-based-investigator": "openrouter/xiaomi/mimo-v2.5",
-    "junior-developer": deepseek("flash"),
-    "risk-analyst": deepseek("flash"),
-    "software-architect": "openrouter/z-ai/glm-5",
-    "structural-analyst": "openrouter/xiaomi/mimo-v2.5",
-    "test-engineer": deepseek("flash"),
+    "adversarial-security-analyst": litellm("deepseek/deepseek-v4-flash"),
+    "adversarial-validator": litellm("openrouter/xiaomi/mimo-v2.5"),
+    "behavioral-analyst": litellm("openrouter/xiaomi/mimo-v2.5"),
+    "concurrency-analyst": litellm("deepseek/deepseek-v4-flash"),
+    "edge-case-explorer": litellm("openrouter/xiaomi/mimo-v2.5"),
+    "evidence-based-investigator": litellm("openrouter/xiaomi/mimo-v2.5"),
+    "junior-developer": litellm("deepseek/deepseek-v4-flash"),
+    "risk-analyst": litellm("deepseek/deepseek-v4-flash"),
+    "software-architect": litellm("openrouter/z-ai/glm-5"),
+    "structural-analyst": litellm("openrouter/xiaomi/mimo-v2.5"),
+    "test-engineer": litellm("deepseek/deepseek-v4-flash"),
     "user-experience-designer": cursor("composer-2.5"),
 }
 

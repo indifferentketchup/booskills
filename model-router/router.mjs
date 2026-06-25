@@ -205,6 +205,7 @@ function fitScore(attrs, request) {
 // Order matters: check the cloud gateways before the generic opencode markers.
 function sourceOf(provider) {
   const s = String(provider);
+  if (s.startsWith("litellm/")) return "litellm";
   if (s.startsWith("deepseek/")) return "deepseek";
   if (s.includes("digitalocean")) return "digitalocean";
   if (s.startsWith("kilo/")) return "kilo";
@@ -428,7 +429,7 @@ function resolvePermissions(provider, registry) {
   const mode = registry.permissions?._default || "bypass";
   const p = registry.permissions?.[permBackend];
   if (!p) {
-    const piBackends = new Set(["deepseek", "kilo", "openrouter", "cursor", "google-antigravity", "llama-swap"]);
+    const piBackends = new Set(["litellm", "deepseek", "kilo", "openrouter", "cursor", "google-antigravity", "llama-swap"]);
     const note = piBackends.has(backend)
       ? "Pi/OMP session: pass provider/model only; no create_agent permission profile"
       : "no permission profile for this backend; pass nothing";

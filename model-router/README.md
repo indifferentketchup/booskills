@@ -23,7 +23,7 @@ Input:
 - `task`: short natural-language task description.
 - `difficulty`: `simple`, `standard`, or `hard`.
 - `contextTokens`: approximate input context size.
-- `provider_priority` (registry block, not a CLI flag): a per-source score bonus so equivalent models route to the preferred provider, then fail over via `fallbacks`. Order (2026-06 Pi): deepseek > kilo > openrouter > digitalocean > reasonix > local > local-edge > subscription > gateway-free > opencode-go (legacy) > other. The router classifies a candidate's source from its provider string. The `workhorse` preset is the default cross-provider pool built on this.
+- `provider_priority` (registry block, not a CLI flag): a per-source score bonus so equivalent models route to the preferred provider, then fail over via `fallbacks`. Order (2026-06 Pi): litellm > deepseek (legacy direct) > kilo > openrouter > digitalocean > reasonix > local > local-edge > subscription > gateway-free > opencode-go (legacy) > other. The router classifies a candidate's source from its provider string. The `workhorse` preset is the default cross-provider pool built on this.
 - `priority`: `cost-efficiency`, `speed`, `quality`, or `balanced` (default). Tunes the scorer: cost-efficiency weights cost + quota and leans reasoning down; speed rewards the per-model `speed` signal (TTFT-oriented) and leans reasoning down; quality rewards higher grade and leans reasoning up. It nudges, it does not override role fit. Mirrors DigitalOcean inference-router's cheapest/fastest/optimal policies.
 - `budget`: `cost_sensitive`, `balanced`, or `quality` (legacy alias mapped onto `priority`).
 - `fanout`: number of agents expected to run in parallel for this dispatch.
