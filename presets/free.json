@@ -6,8 +6,8 @@
     "Prefer minimal scope; lead with the smallest approach.",
     "Subscription-high models (opus, fable, gpt-5, gpt-5.5) are preset pool options for the router but must never be assigned in the agents map or routed as subagents.",
     "Local llama-swap: only one local model resident at a time. When concurrency is 1, dispatch subagents strictly one at a time.",
-    "Default cloud posture: DeepSeek V4 Flash and MiMo 2.5 for bulk work; MiniMax M3 and grade-B models for mid-tier; grade-A/S for explicit quality needs.",
-    "Provider strings use Pi/OMP format (provider/model). Cloud gateway models route via litellm/ (LiteLLM proxy); native Anthropic/OpenAI-Codex/Cursor/Gemini stay direct."
+    "Default cloud posture: Pi-native MiniMax M3, MiMo 2.5/2.5 Pro, and DeepSeek V4 Flash/Pro are the Grade C workhorse pool; use grade-A/S for explicit quality needs.",
+    "Provider strings use Pi/OMP format. Pi-native DeepSeek, Xiaomi, and MiniMax routes use omp/<provider>/<model>; other cloud gateway models route via litellm/."
   ],
   "providers": {
     "impl": [
@@ -37,17 +37,17 @@
     ]
   },
   "agents": {
-    "adversarial-security-analyst": "litellm/deepseek/deepseek-v4-flash",
-    "adversarial-validator": "litellm/openrouter/xiaomi/mimo-v2.5",
-    "behavioral-analyst": "litellm/openrouter/xiaomi/mimo-v2.5",
-    "concurrency-analyst": "litellm/deepseek/deepseek-v4-flash",
-    "edge-case-explorer": "litellm/openrouter/xiaomi/mimo-v2.5",
-    "evidence-based-investigator": "litellm/openrouter/xiaomi/mimo-v2.5",
-    "junior-developer": "litellm/deepseek/deepseek-v4-flash",
-    "risk-analyst": "litellm/deepseek/deepseek-v4-flash",
+    "adversarial-security-analyst": "omp/deepseek/deepseek-v4-flash",
+    "adversarial-validator": "omp/xiaomi/mimo-v2.5",
+    "behavioral-analyst": "omp/xiaomi/mimo-v2.5",
+    "concurrency-analyst": "omp/deepseek/deepseek-v4-flash",
+    "edge-case-explorer": "omp/xiaomi/mimo-v2.5",
+    "evidence-based-investigator": "omp/xiaomi/mimo-v2.5",
+    "junior-developer": "omp/deepseek/deepseek-v4-flash",
+    "risk-analyst": "omp/deepseek/deepseek-v4-flash",
     "software-architect": "litellm/openrouter/z-ai/glm-5",
-    "structural-analyst": "litellm/openrouter/xiaomi/mimo-v2.5",
-    "test-engineer": "litellm/deepseek/deepseek-v4-flash",
+    "structural-analyst": "omp/xiaomi/mimo-v2.5",
+    "test-engineer": "omp/deepseek/deepseek-v4-flash",
     "user-experience-designer": "cursor/composer-2.5"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "preset": "fixture-reasoning-stepdown",
+  "concurrency": 1,
+  "_comment": "Pinned to deepseek-v4-pro (has a reasoning profile with levels) so the step-down case isolates its resolveReasoning() behavior instead of competing in the full preset-sources.json pool.",
+  "providers": {
+    "impl": "deepseek/deepseek-v4-pro"
+  }
+}

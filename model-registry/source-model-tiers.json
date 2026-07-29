@@ -1,8 +1,11 @@
 {
   "_comment": "Canonical model tiers. Paseo provider strings = 'opencode/' + opencode model id for opencode-routed models. subscription-high.neverSubagent: those models must NEVER be deployed as subagents under any circumstances.",
   "workhorse": [
+    "opencode-go/minimax-m3",
     "opencode-go/mimo-v2.5",
-    "reasonix/deepseek-flash/deepseek-v4-flash"
+    "opencode-go/mimo-v2.5-pro",
+    "reasonix/deepseek-flash/deepseek-v4-flash",
+    "reasonix/deepseek-pro/deepseek-v4-pro"
   ],
   "workhorse-local": [
     "==qwen==/qwen3.6-27b",
@@ -10,12 +13,9 @@
   ],
   "mid": [
     "opencode-go/qwen3.7-plus",
-    "reasonix/deepseek-pro/deepseek-v4-pro",
     "opencode-go/minimax-m2.7",
     "opencode-go/qwen3.6-plus",
-    "opencode-go/mimo-v2.5-pro",
-    "opencode-go/minimax-m2.5",
-    "opencode-go/minimax-m3"
+    "opencode-go/minimax-m2.5"
   ],
   "high": [
     "opencode-go/kimi-k2.7-code",

@@ -115,15 +115,38 @@ export const LOAD_DEFAULTS = {
   concurrency_soft: { _default: 4, local: 1, "local-edge": 1, digitalocean: 6 },
 };
 
+// Shared score-accumulator factory. Three near-identical closures existed before
+// this (router.mjs fitScore, router.mjs economics, this file's loadAdjustment),
+// differing only in reason-string decimal precision. `merge()` exists because
+// economics()'s loadCtx block combines an already-scored, already-formatted
+// sub-result (this function's own return value) with its running total; routing
+// that through add() would format an already-formatted reason a second time and
+// double the sign prefix.
+export function makeScorer(reasons, decimals = 1) {
+  let score = 0;
+  return {
+    add(points, reason) {
+      score += points;
+      if (points) reasons.push(`${points > 0 ? "+" : ""}${points.toFixed(decimals)} ${reason}`);
+    },
+    merge(points, formattedReasons) {
+      score += points;
+      reasons.push(...formattedReasons);
+    },
+    get score() { return score; },
+  };
+}
+
 // Soft load penalties for one candidate, never an elimination: in-flight crowding
 // (subagent awareness, per source since rate limits are per account), remaining
 // rolling-window quota (rate-limit awareness, per model), and host saturation for
 // local models (one machine can't truly parallelize a fan-out).
-export function loadAdjustment({ src, isLocal, inflight = 0, usage = 0, quota = 0, host, tuning } = {}) {
+export function loadAdjustment(options = {}) {
+  const { src, isLocal, inflight = 0, usage = 0, quota = 0, host, tuning } = options;
   const t = tuning || LOAD_DEFAULTS;
   const reasons = [];
-  let score = 0;
-  const add = (pts, why) => { score += pts; if (pts) reasons.push(`${pts > 0 ? "+" : ""}${pts.toFixed(1)} ${why}`); };
+  const scorer = makeScorer(reasons, 1);
+  const add = scorer.add;
 
   const softCap = t.concurrency_soft?.[src] ?? t.concurrency_soft?._default ?? 4;
 
@@ -142,5 +165,5 @@ export function loadAdjustment({ src, isLocal, inflight = 0, usage = 0, quota = 
     if (sat > 0.8) add(-Math.min((sat - 0.8) / 0.2, 2) * t.host_load_penalty, `host saturated (cpu ${Math.round(host.cpuSat * 100)}% mem ${Math.round(host.memSat * 100)}%)`);
   }
 
-  return { score, reasons };
+  return { score: scorer.score, reasons };
 }

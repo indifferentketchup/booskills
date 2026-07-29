@@ -31,6 +31,11 @@ def litellm(route: str) -> str:
     return f"litellm/{route}"
 
 
+def omp(provider: str, model: str) -> str:
+    """Route through Pi's native OMP provider integration."""
+    return f"omp/{provider}/{model}"
+
+
 def anthropic(model: str) -> str:
     return f"anthropic/{model}"
 
@@ -63,7 +68,7 @@ def pool(*entries: str | list[str]) -> list[str]:
 
 # Cloud gateway models route through litellm/ (single LiteLLM proxy pool).
 M: dict[str, str | list[str]] = {
-    "mimo-v2.5-pro": litellm("openrouter/xiaomi/mimo-v2.5-pro"),
+    "mimo-v2.5-pro": omp("xiaomi", "mimo-v2.5-pro"),
     "glm-5.1": litellm("openrouter/z-ai/glm-5.2"),
     "qwen3.7-max": litellm("openrouter/qwen/qwen3.7-max"),
     "gpt-5.5": openai_codex("gpt-5.5"),
@@ -71,21 +76,21 @@ M: dict[str, str | list[str]] = {
     "fable": anthropic("claude-fable-5"),
     "composer-2.5": cursor("composer-2.5"),
     "gemini-3.1-pro": gemini("gemini-3.1-pro"),
-    "deepseek-v4-pro": litellm("deepseek/deepseek-v4-pro"),
+    "deepseek-v4-pro": omp("deepseek", "deepseek-v4-pro"),
     "qwen3.7-plus": litellm("openrouter/qwen/qwen3.7-plus"),
     "kimi-k2.6": litellm("moonshot/kimi-k2.6"),
     "glm-5": litellm("openrouter/z-ai/glm-5"),
     "sonnet": anthropic("claude-sonnet-4-6"),
     "gpt-5.4": openai_codex("gpt-5.4"),
     "composer-1.5": cursor("composer-1.5"),
-    "minimax-m3": litellm("minimax-m3"),
+    "minimax-m3": omp("minimax-code", "MiniMax-M3"),
     "haiku": anthropic("claude-haiku-4-5"),
     "gpt-5.1-mini": openai_codex("gpt-5.1-codex-mini"),
     "laguna-m.1": litellm("laguna-m.1"),
     "owl-alpha": litellm("openrouter/owl-alpha"),
     "step-3.7-flash": litellm("openrouter/stepfun/step-3.7-flash"),
-    "mimo-v2.5": litellm("openrouter/xiaomi/mimo-v2.5"),
-    "deepseek-v4-flash": litellm("deepseek/deepseek-v4-flash"),
+    "mimo-v2.5": omp("xiaomi", "mimo-v2.5"),
+    "deepseek-v4-flash": omp("deepseek", "deepseek-v4-flash"),
     "qwen3.6-35b-a3b": local("qwen3.6-35b-a3b"),
     "qwen3.6-27b": local("qwen3.6-27b"),
     "nemotron-cascade-30b": local("nemotron-cascade-2-30b-a3b"),
@@ -126,19 +131,22 @@ GRADE_A = expand(
     "composer-1.5",
 )
 GRADE_B = expand(
-    "minimax-m3",
-    "mimo-v2.5-pro",
-    "deepseek-v4-pro",
     "haiku",
     "gpt-5.1-mini",
     "laguna-m.1",
     "owl-alpha",
     "step-3.7-flash",
 )
-GRADE_C = expand("mimo-v2.5", "deepseek-v4-flash")
+GRADE_C = expand(
+    "minimax-m3",
+    "mimo-v2.5",
+    "mimo-v2.5-pro",
+    "deepseek-v4-flash",
+    "deepseek-v4-pro",
+)
 GRADE_D = expand("qwen3.6-35b-a3b", "qwen3.6-27b")
 GRADE_F = expand("local-embed", "nemotron-3-ultra-free")
-WORKHORSE = expand("mimo-v2.5", "deepseek-v4-flash", "minimax-m3", "step-3.7-flash")
+WORKHORSE = list(GRADE_C)
 WORKHORSE_LOCAL = list(GRADE_D)
 LOCAL = expand("nemotron-cascade-30b", "qwen3.5-9b")
 FREE = expand("nemotron-3-ultra-free", "minimax-m2.5-free", "step-3.7-flash-free")
@@ -157,27 +165,26 @@ LOCAL_PREFERENCES = BASE_PREFERENCES + [
 ]
 
 CLOUD_PREFERENCES = BASE_PREFERENCES + [
-    "Default cloud posture: DeepSeek V4 Flash and MiMo 2.5 for bulk work; MiniMax M3 and grade-B models for mid-tier; grade-A/S for explicit quality needs.",
-    "Provider strings use Pi/OMP format (provider/model). Cloud gateway models route via litellm/ (LiteLLM proxy); native Anthropic/OpenAI-Codex/Cursor/Gemini stay direct.",
+    "Default cloud posture: Pi-native MiniMax M3, MiMo 2.5/2.5 Pro, and DeepSeek V4 Flash/Pro are the Grade C workhorse pool; use grade-A/S for explicit quality needs.",
+    "Provider strings use Pi/OMP format. Pi-native DeepSeek, Xiaomi, and MiniMax routes use omp/<provider>/<model>; other cloud gateway models route via litellm/.",
 ]
 
 DEFAULT_AGENTS_CLOUD = {
-    "adversarial-security-analyst": litellm("deepseek/deepseek-v4-flash"),
-    "adversarial-validator": litellm("openrouter/xiaomi/mimo-v2.5"),
-    "behavioral-analyst": litellm("openrouter/xiaomi/mimo-v2.5"),
-    "concurrency-analyst": litellm("deepseek/deepseek-v4-flash"),
-    "edge-case-explorer": litellm("openrouter/xiaomi/mimo-v2.5"),
-    "evidence-based-investigator": litellm("openrouter/xiaomi/mimo-v2.5"),
-    "junior-developer": litellm("deepseek/deepseek-v4-flash"),
-    "risk-analyst": litellm("deepseek/deepseek-v4-flash"),
+    "adversarial-security-analyst": omp("deepseek", "deepseek-v4-flash"),
+    "adversarial-validator": omp("xiaomi", "mimo-v2.5"),
+    "behavioral-analyst": omp("xiaomi", "mimo-v2.5"),
+    "concurrency-analyst": omp("deepseek", "deepseek-v4-flash"),
+    "edge-case-explorer": omp("xiaomi", "mimo-v2.5"),
+    "evidence-based-investigator": omp("xiaomi", "mimo-v2.5"),
+    "junior-developer": omp("deepseek", "deepseek-v4-flash"),
+    "risk-analyst": omp("deepseek", "deepseek-v4-flash"),
     "software-architect": litellm("openrouter/z-ai/glm-5"),
-    "structural-analyst": litellm("openrouter/xiaomi/mimo-v2.5"),
-    "test-engineer": litellm("deepseek/deepseek-v4-flash"),
+    "structural-analyst": omp("xiaomi", "mimo-v2.5"),
+    "test-engineer": omp("deepseek", "deepseek-v4-flash"),
     "user-experience-designer": cursor("composer-2.5"),
 }
 
 DEFAULT_AGENTS_LOCAL = {
-    **DEFAULT_AGENTS_CLOUD,
     "adversarial-security-analyst": local("qwen3.6-35b-a3b"),
     "adversarial-validator": local("qwen3.6-27b"),
     "behavioral-analyst": local("qwen3.6-35b-a3b"),
@@ -193,7 +200,6 @@ DEFAULT_AGENTS_LOCAL = {
 }
 
 DEFAULT_AGENTS_SUB_LOW = {
-    **DEFAULT_AGENTS_CLOUD,
     "adversarial-security-analyst": anthropic("claude-haiku-4-5"),
     "adversarial-validator": anthropic("claude-haiku-4-5"),
     "behavioral-analyst": openai_codex("gpt-5.1-codex-mini"),
@@ -209,7 +215,6 @@ DEFAULT_AGENTS_SUB_LOW = {
 }
 
 DEFAULT_AGENTS_SUB_MID = {
-    **DEFAULT_AGENTS_CLOUD,
     "adversarial-security-analyst": anthropic("claude-sonnet-4-6"),
     "adversarial-validator": anthropic("claude-sonnet-4-6"),
     "behavioral-analyst": openai_codex("gpt-5.4"),

@@ -167,12 +167,12 @@ function disqualify(key, attrs, request, neverSub) {
 // Soft quality and role-fit score.
 function fitScore(attrs, request) {
   const reasons = [];
-  let score = 0;
-  const add = (points, reason) => { score += points; if (points) reasons.push(`${points > 0 ? "+" : ""}${points.toFixed(0)} ${reason}`); };
+  const scorer = ledger.makeScorer(reasons, 0);
+  const add = scorer.add;
 
   if (!attrs) {
     add(50, "unknown model (neutral baseline)");
-    return { score, reasons, grade: "?" };
+    return { score: scorer.score, reasons, grade: "?" };
   }
 
   // Role affinity is the backbone.
@@ -198,15 +198,20 @@ function fitScore(attrs, request) {
   const priority = PRIORITIES[request.priority] || PRIORITIES.balanced;
   if (priority.qualityBonus) add(gradeVal * priority.qualityBonus, `quality priority (grade ${attrs.grade})`);
 
-  return { score, reasons, grade: attrs.grade };
+  return { score: scorer.score, reasons, grade: attrs.grade };
 }
 
 // Classify a provider string into a cost/priority source for provider_priority.
 // Order matters: check the cloud gateways before the generic opencode markers.
+// The omp/ wrapper prefix (routes any litellm/ model through the OMP agent
+// provider) is stripped first so classification runs on the underlying route.
 function sourceOf(provider) {
-  const s = String(provider);
+  let s = String(provider);
+  if (s.startsWith("omp/")) s = s.slice(4);
   if (s.startsWith("litellm/")) return "litellm";
   if (s.startsWith("deepseek/")) return "deepseek";
+  if (s.startsWith("xiaomi/")) return "xiaomi";
+  if (s.startsWith("minimax-code/")) return "minimax-code";
   if (s.includes("digitalocean")) return "digitalocean";
   if (s.startsWith("kilo/")) return "kilo";
   if (s.startsWith("openrouter/") || s.includes("openrouter")) return "openrouter";
@@ -230,31 +235,40 @@ function sourceOf(provider) {
 }
 
 // Economics tiebreak: provider priority, cost, quota, live load, locality, residency.
-function economics(provider, key, request, registry, presetIndex, loadCtx) {
-  const reasons = [];
-  let score = 0;
-  const add = (points, reason) => { score += points; if (points) reasons.push(`${points > 0 ? "+" : ""}${points.toFixed(1)} ${reason}`); };
-
-  const priority = PRIORITIES[request.priority] || PRIORITIES.balanced;
-
-  // Provider priority: route equivalent models to the preferred source (free DO
-  // credits first, then cheap cloud, then local; opencode-go deprioritized).
-  const src = sourceOf(provider);
+// Provider priority: route equivalent models to the preferred source (free DO
+// credits first, then cheap cloud, then local; opencode-go deprioritized).
+function scoreProviderPriority(add, src, registry) {
   const pp = registry.provider_priority?.[src];
   if (typeof pp === "number" && pp) add(pp, `provider ${src}`);
+}
 
-  const regKey = registryLookupKey(provider, registry);
+// Cost priority: penalize blended input/output cost, weighted by the active
+// priority profile. Returns the resolved pricing so the caller can read `_band`.
+function scoreCost(add, regKey, request, registry, priority) {
   const pricing = pricingForContext(regKey, registry, request.contextTokens);
   const cost = blendedCost(pricing);
   add(-cost * priority.costWeight, `blended cost $${cost.toFixed(3)}/M${pricing._band ? ` (${pricing._band})` : ""}`);
+  return pricing;
+}
 
-  // Speed priority: reward the per-model responsiveness signal (TTFT-oriented).
+// Speed priority: reward the per-model responsiveness signal (TTFT-oriented).
+function scoreSpeed(add, regKey, registry, priority) {
   const speed = registry.speed?.[regKey];
   if (priority.speedWeight && typeof speed === "number") add(speed * priority.speedWeight, `speed ${speed}`);
+}
 
+// Quota awareness: reward remaining rolling-window headroom. Returns the
+// resolved quota so the caller can read it (return value, live-load lookup).
+function scoreQuota(add, regKey, provider, registry) {
   const quota = Number(registry.quotas_per_5h?.[regKey] ?? (isLocalProvider(provider) ? 200 : 0));
   add(Math.min(quota, 30000) / 1000, `quota ${quota}/5h`);
+  return quota;
+}
 
+// Locality: local-model serial bonus / fan-out penalty / no-swap residency
+// bonus. Returns whether the provider is local, for the caller's later use
+// (live-load lookup, the return object's `isLocal` field).
+function scoreLocality(add, provider, key, request) {
   const local = isLocalProvider(provider);
   if (local && request.fanout > 1) {
     add(-80, `local penalized for fan-out x${request.fanout}`);
@@ -264,26 +278,51 @@ function economics(provider, key, request, registry, presetIndex, loadCtx) {
       add(25, "already resident in llama-swap (no model swap)");
     }
   }
+  return local;
+}
+
+// Live load: soft penalties for in-flight crowding, quota exhaustion, and
+// (local only) host saturation. Reconciled from the shared cross-process
+// ledger. Takes the scorer object rather than a bare `add`, because
+// ledger.loadAdjustment() returns an already-scored, already-formatted
+// sub-result that must be merged verbatim, not re-formatted through add().
+function scoreLiveLoad(scorer, src, isLocal, key, quota, loadCtx) {
+  if (!loadCtx) return;
+  const adj = ledger.loadAdjustment({
+    src,
+    isLocal,
+    inflight: loadCtx.bySrc?.[src]?.inflight,
+    usage: loadCtx.byKey?.[key]?.usage,
+    quota,
+    host: loadCtx.host,
+    tuning: loadCtx.tuning,
+  });
+  scorer.merge(adj.score, adj.reasons);
+}
+
+function economics(provider, key, request, registry, presetIndex, loadCtx) {
+  const reasons = [];
+  const scorer = ledger.makeScorer(reasons, 1);
+  const add = scorer.add;
+
+  const priority = PRIORITIES[request.priority] || PRIORITIES.balanced;
+
+  const src = sourceOf(provider);
+  scoreProviderPriority(add, src, registry);
+
+  const regKey = registryLookupKey(provider, registry);
+  const pricing = scoreCost(add, regKey, request, registry, priority);
+  const cost = blendedCost(pricing);
+  scoreSpeed(add, regKey, registry, priority);
+  const quota = scoreQuota(add, regKey, provider, registry);
+
+  const local = scoreLocality(add, provider, key, request);
 
   add(-presetIndex * 0.01, "preset order");
 
-  // Live load: soft penalties for in-flight crowding, quota exhaustion, and (local
-  // only) host saturation. Reconciled from the shared cross-process ledger.
-  if (loadCtx) {
-    const adj = ledger.loadAdjustment({
-      src,
-      isLocal: local,
-      inflight: loadCtx.bySrc?.[src]?.inflight,
-      usage: loadCtx.byKey?.[key]?.usage,
-      quota,
-      host: loadCtx.host,
-      tuning: loadCtx.tuning,
-    });
-    score += adj.score;
-    reasons.push(...adj.reasons);
-  }
+  scoreLiveLoad(scorer, src, local, key, quota, loadCtx);
 
-  return { score, cost, quota, isLocal: local, band: pricing._band || "base", reasons };
+  return { score: scorer.score, cost, quota, isLocal: local, band: pricing._band || "base", reasons };
 }
 
 function scoreCandidate(provider, request, registry, neverSub, presetIndex, loadCtx) {
@@ -357,7 +396,15 @@ function chooseProvider(request, preset, registry) {
   if (!roleValue) throw new Error(`Preset has no provider entry for role: ${request.role}`);
 
   if (typeof roleValue === "string") {
-    return { provider: roleValue, modelId: normalizeModelId(roleValue), rationale: "Preset role is pinned to a single provider.", reasoning: resolveReasoning(roleValue, registry, request.difficulty, request.contextTokens, request.priority), permissions: resolvePermissions(roleValue, registry), fallbacks: [], scores: [] };
+    return {
+      provider: roleValue,
+      modelId: normalizeModelId(roleValue),
+      rationale: "Preset role is pinned to a single provider.",
+      reasoning: resolveReasoning(roleValue, registry, request.difficulty, request.contextTokens, request.priority),
+      permissions: resolvePermissions(roleValue, registry),
+      fallbacks: [],
+      scores: [],
+    };
   }
   if (!Array.isArray(roleValue)) throw new Error(`Provider entry for ${request.role} must be a string or array`);
 
@@ -371,7 +418,15 @@ function chooseProvider(request, preset, registry) {
     throw new Error(`All candidates eliminated for role ${request.role}: ${why}`);
   }
 
-  return { provider: survivors[0].provider, modelId: survivors[0].modelId, rationale: buildRationale(survivors[0], request), reasoning: resolveReasoning(survivors[0].provider, registry, request.difficulty, request.contextTokens, request.priority), permissions: resolvePermissions(survivors[0].provider, registry), fallbacks: survivors.slice(1).map((s) => s.provider), scores: scored };
+  return {
+    provider: survivors[0].provider,
+    modelId: survivors[0].modelId,
+    rationale: buildRationale(survivors[0], request),
+    reasoning: resolveReasoning(survivors[0].provider, registry, request.difficulty, request.contextTokens, request.priority),
+    permissions: resolvePermissions(survivors[0].provider, registry),
+    fallbacks: survivors.slice(1).map((s) => s.provider),
+    scores: scored,
+  };
 }
 
 // Resolve the recommended OpenCode reasoningEffort for the chosen model at this
@@ -417,7 +472,8 @@ function resolveReasoning(provider, registry, difficulty, contextTokens = 0, pri
 // Resolve the permission posture for the chosen provider's backend. Defaults to
 // bypass/yolo (registry permissions._default); settings go to create_agent.
 function resolvePermissions(provider, registry) {
-  let backend = String(provider).split("/")[0];
+  const parts = String(provider).split("/");
+  let backend = parts[0] === "omp" ? parts[1] : parts[0];
   if (backend.startsWith("oc-")) backend = "opencode";
   const backendAliases = {
     anthropic: "claude",
@@ -429,7 +485,7 @@ function resolvePermissions(provider, registry) {
   const mode = registry.permissions?._default || "bypass";
   const p = registry.permissions?.[permBackend];
   if (!p) {
-    const piBackends = new Set(["litellm", "deepseek", "kilo", "openrouter", "cursor", "google-antigravity", "llama-swap"]);
+    const piBackends = new Set(["litellm", "deepseek", "xiaomi", "minimax-code", "kilo", "openrouter", "cursor", "google-antigravity", "llama-swap"]);
     const note = piBackends.has(backend)
       ? "Pi/OMP session: pass provider/model only; no create_agent permission profile"
       : "no permission profile for this backend; pass nothing";
@@ -473,7 +529,10 @@ function printHuman(result, request, presetPath, explain) {
         console.log(`  - ${c.provider} ELIMINATED: ${c.reason}`);
         continue;
       }
-      console.log(`  - ${c.provider} score=${c.score.toFixed(2)} grade=${c.grade} fit=${c.fitScore} econ=${c.econScore} cost=${c.effectiveCostPerMTok.toFixed(3)} quota=${c.quotaPer5h} band=${c.band}`);
+      console.log(
+        `  - ${c.provider} score=${c.score.toFixed(2)} grade=${c.grade} fit=${c.fitScore} ` +
+        `econ=${c.econScore} cost=${c.effectiveCostPerMTok.toFixed(3)} quota=${c.quotaPer5h} band=${c.band}`,
+      );
       if (explain) for (const r of c.reasons) console.log(`      ${r}`);
     }
   }
@@ -487,7 +546,7 @@ Options:
   --preset <path>          Active preset JSON path. Default: ${DEFAULT_PRESET}
   --model-tiers <path>     Model registry path. Default: ${DEFAULT_MODEL_TIERS}
   --difficulty <value>     simple, standard, or hard. Default: standard
-  --budget <value>         cost_sensitive, balanced, or quality (legacy alias for --priority)
+  --budget <value>         cost_sensitive, balanced, or quality (deprecated, use --priority)
   --priority <value>       cost-efficiency, speed, quality, or balanced. Default: balanced
   --context-tokens <n>     Approximate input context size. Default: 0
   --requires <list>        Comma-separated hard modality needs, e.g. vision,computer-use
@@ -554,14 +613,40 @@ function runOne(args) {
   else printHuman(result, request, args.presetPath, args.explain);
 }
 
+const SAMPLE_SCENARIOS = [
+  {
+    presetPath: "~/.paseo/presets/workhorse.json",
+    role: "ui",
+    task: "review a screenshot-heavy frontend flow with visual design risks",
+    requires: ["image"],
+    contextTokens: 120000,
+    difficulty: "standard",
+    fanout: 1,
+    explain: true,
+  },
+  {
+    presetPath: "~/.paseo/presets/workhorse.json",
+    role: "impl",
+    task: "apply a mechanical OpenSpec implementation across files",
+    contextTokens: 80000,
+    difficulty: "simple",
+    fanout: 3,
+    explain: true,
+  },
+  {
+    presetPath: "~/.paseo/presets/workhorse.json",
+    role: "research",
+    task: "browse a 1M-token repo and synthesize findings",
+    contextTokens: 400000,
+    difficulty: "hard",
+    fanout: 1,
+    explain: true,
+  },
+];
+
 function runSamples(args) {
-  const samples = [
-    { ...args, presetPath: "~/.paseo/presets/workhorse.json", role: "ui", task: "review a screenshot-heavy frontend flow with visual design risks", requires: ["image"], contextTokens: 120000, difficulty: "standard", fanout: 1, explain: true },
-    { ...args, presetPath: "~/.paseo/presets/workhorse.json", role: "impl", task: "apply a mechanical OpenSpec implementation across files", contextTokens: 80000, difficulty: "simple", fanout: 3, explain: true },
-    { ...args, presetPath: "~/.paseo/presets/workhorse.json", role: "research", task: "browse a 1M-token repo and synthesize findings", contextTokens: 400000, difficulty: "hard", fanout: 1, explain: true },
-  ];
-  for (const sample of samples) {
-    runOne(sample);
+  for (const scenario of SAMPLE_SCENARIOS) {
+    runOne({ ...args, ...scenario });
     console.log("");
   }
 }

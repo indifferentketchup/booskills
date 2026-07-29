@@ -1,6 +1,6 @@
 {
   "name": "booskills",
-  "version": "1.0.0",
+  "version": "1.4.1",
   "description": "Skill catalog, agent personas, and deterministic model router for AI coding agents",
   "repository": {
     "type": "git",

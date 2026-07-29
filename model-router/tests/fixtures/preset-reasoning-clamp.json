@@ -1,0 +1,8 @@
+{
+  "preset": "fixture-reasoning-clamp",
+  "concurrency": 1,
+  "_comment": "Pinned to reasonix-1, which carries the deliberately corrupted reasoning entry (task 1.5), so the clamp case isolates its resolveReasoning() behavior instead of competing in the full preset-sources.json pool.",
+  "providers": {
+    "impl": "reasonix/reasonix-1"
+  }
+}
