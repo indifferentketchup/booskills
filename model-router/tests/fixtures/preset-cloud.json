@@ -1,0 +1,44 @@
+{
+  "preset": "fixture-cloud",
+  "concurrency": 4,
+  "preferences": [
+    "Test fixture derived from presets/workhorse.json, plus one neverSubagent model for guardrail coverage (task 1.2)."
+  ],
+  "providers": {
+    "impl": [
+      "litellm/openrouter/xiaomi/mimo-v2.5",
+      "litellm/deepseek/deepseek-v4-flash",
+      "litellm/minimax-m3",
+      "litellm/openrouter/stepfun/step-3.7-flash",
+      "anthropic/claude-opus-4-8"
+    ],
+    "ui": [
+      "litellm/openrouter/xiaomi/mimo-v2.5",
+      "litellm/deepseek/deepseek-v4-flash",
+      "litellm/minimax-m3",
+      "litellm/openrouter/stepfun/step-3.7-flash",
+      "anthropic/claude-opus-4-8"
+    ],
+    "audit": [
+      "litellm/openrouter/xiaomi/mimo-v2.5",
+      "litellm/deepseek/deepseek-v4-flash",
+      "litellm/minimax-m3",
+      "litellm/openrouter/stepfun/step-3.7-flash",
+      "anthropic/claude-opus-4-8"
+    ],
+    "research": [
+      "litellm/openrouter/xiaomi/mimo-v2.5",
+      "litellm/deepseek/deepseek-v4-flash",
+      "litellm/minimax-m3",
+      "litellm/openrouter/stepfun/step-3.7-flash",
+      "anthropic/claude-opus-4-8"
+    ],
+    "planning": [
+      "litellm/openrouter/xiaomi/mimo-v2.5",
+      "litellm/deepseek/deepseek-v4-flash",
+      "litellm/minimax-m3",
+      "litellm/openrouter/stepfun/step-3.7-flash",
+      "anthropic/claude-opus-4-8"
+    ]
+  }
+}

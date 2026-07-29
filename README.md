@@ -49,7 +49,7 @@ On Windows: `pwsh scripts/install.ps1` (copy mode; re-run after every pull).
 ```bash
 cd model-router/ui
 npm install
-LLAMA_SWAP_URL=http://100.101.41.16:8401 PASEO_DIR=~/.paseo npm run dev
+LLAMA_SWAP_URL=http://<your-llama-swap-host>:8401 PASEO_DIR=~/.paseo npm run dev
 ```
 
 Control panel at `http://localhost:3000`, with tabs for Playground, Load dashboard, Provider priority editor, and Preset editor.
@@ -60,18 +60,18 @@ Control panel at `http://localhost:3000`, with tabs for Playground, Load dashboa
 |--------|-------|------|
 | `grade-S` | S | GLM-5.1, Qwen3.7-Max, GPT-5.5, Opus, Fable, Composer-2.5, Gemini-3.1-Pro |
 | `grade-A` | A | Qwen3.7-Plus, Kimi-K2.6, GLM-5, Sonnet, GPT-5.4, Composer-1.5 |
-| `grade-B` | B | MiniMax-M3, Mimo-V2.5-Pro, DeepSeek-V4-Pro, Haiku, GPT-5.1-Codex-Mini, Laguna-M.1, Owl-Alpha, Step-3.7-Flash |
-| `grade-C` | C | MiMo-V2.5, DeepSeek-V4-Flash |
+| `grade-B` | B | Haiku, GPT-5.1-Codex-Mini, Laguna-M.1, Owl-Alpha, Step-3.7-Flash |
+| `grade-C` | C | MiniMax-M3, MiMo-V2.5/2.5-Pro, DeepSeek-V4-Flash/Pro |
 | `grade-D` | D | Qwen3.6-35b-a3b, Qwen3.6-27b (local, $0) |
 | `grade-F` | F | llama-swap embed + gateway free-tier |
-| `workhorse` | C+A | MiMo-V2.5, DeepSeek-V4-Flash, MiniMax-M3, Step-3.7-Flash |
+| `workhorse` | C | MiniMax-M3, MiMo-V2.5/2.5-Pro, DeepSeek-V4-Flash/Pro |
 | `workhorse-local` | D | Local qwen duo |
 | `local` | D | Nemotron Cascade 30B + Qwen 9B |
 | `free` | C | Gateway free-tier (Nemotron Ultra, MiniMax M2.5, Step 3.7 Flash) |
 | `subscription-low` | B | GPT-5.1-Codex-Mini + Haiku |
 | `subscription-mid` | A | GPT-5.4 + Sonnet |
 
-Every preset is an array pool, never a single pinned model, so the router picks from the pool per dispatch based on the task in front of it instead of a fixed assignment. Provider strings follow Pi/OMP `provider/model` format: cloud gateway models route through the `litellm/` proxy, local models through llama-swap, and the rest are native Anthropic, OpenAI-Codex, Cursor, or Gemini strings.
+Every preset is an array pool, never a single pinned model, so the router picks from the pool per dispatch based on the task in front of it instead of a fixed assignment. Provider strings follow Pi/OMP format: the default Grade C providers use `omp/deepseek/`, `omp/xiaomi/`, and `omp/minimax-code/`; other cloud gateway models use the `litellm/` proxy; local models use llama-swap.
 
 After editing `scripts/generate-presets.py`, regenerate and reinstall:
 

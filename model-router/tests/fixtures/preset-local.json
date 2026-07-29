@@ -1,0 +1,29 @@
+{
+  "preset": "fixture-local",
+  "concurrency": 1,
+  "preferences": [
+    "Test fixture derived from presets/grade-D.json, for local fan-out penalty and resident-local bonus cases."
+  ],
+  "providers": {
+    "impl": [
+      "llama-swap/qwen3.6-35b-a3b",
+      "llama-swap/qwen3.6-27b"
+    ],
+    "ui": [
+      "llama-swap/qwen3.6-35b-a3b",
+      "llama-swap/qwen3.6-27b"
+    ],
+    "audit": [
+      "llama-swap/qwen3.6-35b-a3b",
+      "llama-swap/qwen3.6-27b"
+    ],
+    "research": [
+      "llama-swap/qwen3.6-35b-a3b",
+      "llama-swap/qwen3.6-27b"
+    ],
+    "planning": [
+      "llama-swap/qwen3.6-35b-a3b",
+      "llama-swap/qwen3.6-27b"
+    ]
+  }
+}

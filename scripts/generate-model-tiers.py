@@ -14,9 +14,9 @@ OUT_HOME = Path(os.environ.get("PASEO_MODEL_TIERS", Path.home() / ".paseo" / "mo
 OUT_REPO = REPO / "model-registry" / "model-tiers.json"
 
 GATEWAY: dict[str, str] = {
-    "mimo-v2.5": "litellm/openrouter/xiaomi/mimo-v2.5",
-    "mimo-v2.5-pro": "litellm/openrouter/xiaomi/mimo-v2.5-pro",
-    "minimax-m3": "litellm/minimax-m3",
+    "mimo-v2.5": "omp/xiaomi/mimo-v2.5",
+    "mimo-v2.5-pro": "omp/xiaomi/mimo-v2.5-pro",
+    "minimax-m3": "omp/minimax-code/MiniMax-M3",
     "minimax-m2.7": "litellm/minimax-m2.7",
     "minimax-m2.5": "litellm/openrouter/minimax/minimax-m2.5",
     "qwen3.7-plus": "litellm/openrouter/qwen/qwen3.7-plus",
@@ -42,6 +42,7 @@ KEY_ALIASES: dict[str, str] = {
     "claude-sonnet-4-6": "sonnet",
     "claude-haiku-4-5": "haiku",
     "gpt-5.1-codex-mini": "gpt-5.1-mini",
+    "MiniMax-M3": "minimax-m3",
     "nemotron-cascade-2-30b-a3b": "qwen3.6-35b-a3b",
 }
 
@@ -158,9 +159,9 @@ def remap_tier_provider(entry: str) -> str:
         return GATEWAY.get(slug, f"litellm/openrouter/{slug}")
     if s.startswith("reasonix/"):
         if "deepseek-v4-flash" in s:
-            return "litellm/deepseek/deepseek-v4-flash"
+            return "omp/deepseek/deepseek-v4-flash"
         if "deepseek-v4-pro" in s:
-            return "litellm/deepseek/deepseek-v4-pro"
+            return "omp/deepseek/deepseek-v4-pro"
     if s.startswith("deepseek/"):
         return f"litellm/{s}"
     if s.startswith("openrouter/"):
@@ -217,12 +218,14 @@ def patch_subscription_high(registry: dict) -> None:
 def patch_provider_priority(registry: dict) -> None:
     registry["provider_priority"] = {
         "_note": (
-            "Per-source score bonus for Pi/OMP provider strings (2026-06). "
-            "litellm proxy first, then legacy direct deepseek/kilo/openrouter, local llama-swap, "
+            "Per-source score bonus for Pi/OMP provider strings (2026-07). "
+            "litellm proxy first, then native DeepSeek/Xiaomi/MiniMax, local llama-swap, "
             "native subscriptions, gateway :free variants; opencode-go kept as legacy fallback."
         ),
         "litellm": 42,
         "deepseek": 38,
+        "xiaomi": 38,
+        "minimax-code": 38,
         "kilo": 34,
         "openrouter": 30,
         "digitalocean": 28,

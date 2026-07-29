@@ -1,0 +1,14 @@
+{
+  "preset": "fixture-pinned",
+  "concurrency": 4,
+  "preferences": [
+    "Test fixture: impl role pinned to a single provider string (no scoring). Other roles fall back to a trivial array so any case can query any role without erroring."
+  ],
+  "providers": {
+    "impl": "anthropic/claude-sonnet-4-6",
+    "ui": ["anthropic/claude-sonnet-4-6"],
+    "audit": ["anthropic/claude-sonnet-4-6"],
+    "research": ["anthropic/claude-sonnet-4-6"],
+    "planning": ["anthropic/claude-sonnet-4-6"]
+  }
+}
