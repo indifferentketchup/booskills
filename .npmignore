@@ -1,0 +1,9 @@
+.ast-cache/
+**/.ast-cache/**
+.aislop/
+**/.aislop/**
+.codesight/
+.commandcode/
+.boocontext/
+__pycache__/
+*.pyc

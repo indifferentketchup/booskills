@@ -1,0 +1,35 @@
+{
+  "name": "booskills",
+  "version": "1.0.0",
+  "description": "Skill catalog, agent personas, and deterministic model router for AI coding agents",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/indifferentketchup/booskills.git"
+  },
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test model-router/tests/*.test.mjs"
+  },
+  "files": [
+    "skills",
+    "agents",
+    "model-router/router.mjs",
+    "model-router/load-ledger.mjs",
+    "model-router/README.md",
+    "model-registry",
+    "presets",
+    "scripts/install.sh",
+    "scripts/install.ps1",
+    "scripts/update.ps1",
+    "scripts/seed-presets.sh",
+    "scripts/generate-presets.py",
+    "scripts/generate-model-tiers.py",
+    "scripts/stamp-standing-rules.sh",
+    "scripts/apply-agent-models.sh",
+    "scripts/paseo-preset",
+    "scripts/omp-preset"
+  ]
+}
