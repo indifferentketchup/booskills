@@ -105,6 +105,11 @@ bash "$REPO_DIR/scripts/seed-presets.sh"
 echo "--- Installing model router ---"
 create_link "$REPO_DIR/model-router/router.mjs" "$HOME/.paseo/bin/model-router" "model-router"
 
+# Health scorer: same fixed-path treatment. The audit, refactor, and architecture
+# skills run it against other repos, where a repo-relative path does not resolve.
+echo "--- Installing health scorer ---"
+create_link "$REPO_DIR/scripts/health-score.mjs" "$HOME/.paseo/bin/health-score" "health-score"
+
 # Codex agent TOMLs
 echo "--- Installing Codex agents ---"
 for toml in "$REPO_DIR/agents/codex/"*.toml; do
