@@ -6,7 +6,7 @@ This is my personal catalog of agent skills, plus the model router and Paseo pre
 
 17 skills cover the work an agent actually gets asked to do: review a diff, investigate a failure, map an unfamiliar codebase, plan a change through OpenSpec, refactor in small steps, build or critique frontend UI, research a technical question. Each skill is one SKILL.md file (1626 lines total across all 17), written to a shared format so any agent that reads one knows what to expect from the rest.
 
-Next to the skills sit 12 agent personas, structural-analyst, risk-analyst, security-analyst, and so on, each rendered three times: a canonical Claude Code file, a Codex TOML, and an OpenCode markdown file. Same persona, same behavior, regardless of which tool dispatches it.
+Next to the skills sit 13 agent personas, structural-analyst, risk-analyst, security-analyst, and so on, each rendered three times: a canonical Claude Code file, a Codex TOML, and an OpenCode markdown file. Same persona, same behavior, regardless of which tool dispatches it.
 
 The piece I spent the most time on is the model router. When a skill needs to hand work to a subagent, it doesn't hardcode a model. It calls `boo-router`, which calls `model-router/router.mjs`, which scores every candidate in the active preset's pool against grade, role fit, effective cost, quota, and current load, and returns one provider string. No LLM sits on the routing path, so a pick is reproducible and you can see why it happened with `--explain`.
 
@@ -38,7 +38,7 @@ On Windows: `pwsh scripts/install.ps1` (copy mode; re-run after every pull).
 ## Key numbers
 
 - 17 skills, 1626 SKILL.md lines total
-- 12 agent personas, 3 platform renderings each (36 files)
+- 13 agent personas, 3 platform renderings each (39 files)
 - 12 Paseo orchestration presets, all array pools, no pinned model strings
 - Model router: 547 lines of scoring logic, 146 lines of load ledger, plus a Next.js control UI
 - Routing categories: `impl`, `ui`, `audit`, `research`, `planning`
