@@ -56,6 +56,7 @@
     "junior-developer": "pi/deepseek/deepseek-v4-flash",
     "risk-analyst": "pi/deepseek/deepseek-v4-flash",
     "software-architect": "litellm/openrouter/z-ai/glm-5",
+    "source-researcher": "pi/xiaomi/mimo-v2.5",
     "structural-analyst": "pi/xiaomi/mimo-v2.5",
     "test-engineer": "pi/deepseek/deepseek-v4-flash",
     "user-experience-designer": "cursor/composer-2.5"

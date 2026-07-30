@@ -41,6 +41,7 @@
     "junior-developer": "anthropic/claude-haiku-4-5",
     "risk-analyst": "anthropic/claude-haiku-4-5",
     "software-architect": "openai-codex/gpt-5.1-codex-mini",
+    "source-researcher": "openai-codex/gpt-5.1-codex-mini",
     "structural-analyst": "openai-codex/gpt-5.1-codex-mini",
     "test-engineer": "anthropic/claude-haiku-4-5",
     "user-experience-designer": "anthropic/claude-haiku-4-5"

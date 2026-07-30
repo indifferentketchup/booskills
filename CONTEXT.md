@@ -22,7 +22,7 @@ booskills/
 │   ├── boo-router/            # wraps model-router/router.mjs; picks one provider per dispatch (L/C/B/A/S presets)
 │   ├── boo-validating-changes/ # fresh-context plan + implementation validation for OpenSpec changes
 │   └── paseo-boo/
-├── agents/                    # 13 agent personas (canonical)
+├── agents/                    # 14 agent personas (canonical)
 │   ├── adversarial-security-analyst.md
 │   ├── adversarial-validator.md
 │   ├── behavioral-analyst.md
@@ -32,6 +32,7 @@ booskills/
 │   ├── junior-developer.md
 │   ├── risk-analyst.md
 │   ├── software-architect.md
+│   ├── source-researcher.md    # web-capable, dispatched by boo-researching
 │   ├── structural-analyst.md
 │   ├── system-architect.md    # cross-service/bounded-context topology; software-architect's intra-codebase counterpart
 │   ├── test-engineer.md

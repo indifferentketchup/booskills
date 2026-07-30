@@ -41,6 +41,7 @@
     "junior-developer": "anthropic/claude-sonnet-4-6",
     "risk-analyst": "anthropic/claude-sonnet-4-6",
     "software-architect": "openai-codex/gpt-5.4",
+    "source-researcher": "openai-codex/gpt-5.4",
     "structural-analyst": "openai-codex/gpt-5.4",
     "test-engineer": "anthropic/claude-sonnet-4-6",
     "user-experience-designer": "anthropic/claude-sonnet-4-6"

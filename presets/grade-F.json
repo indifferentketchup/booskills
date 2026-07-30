@@ -40,6 +40,7 @@
     "junior-developer": "llama-swap/qwen3.6-27b",
     "risk-analyst": "llama-swap/qwen3.6-35b-a3b",
     "software-architect": "llama-swap/qwen3.6-35b-a3b",
+    "source-researcher": "llama-swap/qwen3.6-35b-a3b",
     "structural-analyst": "llama-swap/qwen3.6-27b",
     "test-engineer": "llama-swap/qwen3.6-27b",
     "user-experience-designer": "llama-swap/qwen3.6-35b-a3b"

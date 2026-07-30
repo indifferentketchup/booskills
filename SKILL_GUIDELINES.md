@@ -105,7 +105,7 @@ Every skill that produces a judgment (review, investigation, discovery, gap anal
 
 **Trust classes:**
 - **Codebase** = trusted current-state anchor. A file path + line number stands alone; no corroboration needed. When codebase contradicts docs, codebase wins on what the system does today.
-- **Web** = outside the trust boundary. Single web claim driving a recommendation gets marked `single-source` and cannot stand alone. Two independent sources or it stays flagged.
+- **Web** = outside the trust boundary. Single web claim driving a recommendation gets marked `single-source` and cannot stand alone. Two independent sources not derived from one another pass; otherwise it stays flagged. Exception: a single **primary** source (the project's own repo, official docs, changelog, or spec, i.e. the party that controls the thing being claimed about, stating it first-hand) passes on its own, marked `single-source (primary)`. A single **secondary** source (blog, third-party writeup, restatement of a primary source) does not pass alone.
 - **Provided** (operator-pasted material) = same scrutiny as web.
 
 **Proximity heuristic.** Closer to origin = stronger: reproduced failure > passing test > source code > commit history > docs > blog > LLM output. Three inversions: spec-compliance contexts (spec wins over divergent code), regulatory contexts, and passing tests (prove only the tested paths; not symmetric with failing tests).
