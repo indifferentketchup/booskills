@@ -1,0 +1,21 @@
+{
+  "skill": "boo-removing-dead-code",
+  "should_trigger": [
+    "delete this dead code",
+    "remove the unused exports from the utils module",
+    "this file has no callers, drop it",
+    "execute the dead-code items from the audit backlog",
+    "clean out the unreferenced helpers in src/legacy",
+    "the --budget flag has no caller, remove it",
+    "prune the unused dependencies and the files that only they import",
+    "get rid of the commented-out module nobody imports"
+  ],
+  "near_miss": [
+    { "query": "find the dead code in this repo", "expected": "boo-auditing-code-quality" },
+    { "query": "what needs refactoring", "expected": "boo-auditing-code-quality" },
+    { "query": "extract this into its own file", "expected": "boo-refactoring-code" },
+    { "query": "dedupe these two near-identical helpers", "expected": "boo-refactoring-code" },
+    { "query": "this test fails, delete it so the suite passes", "expected": "boo-investigating-failures" },
+    { "query": "review my branch before I merge it", "expected": "boo-reviewing-code" }
+  ]
+}

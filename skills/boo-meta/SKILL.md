@@ -37,7 +37,7 @@ Match the goal to the closest shape; compose when a goal spans shapes.
 | Fuzzy idea ("I want something that...") | boo-refining-ideas (inline) > boo-planning-changes > boo-validating-changes (plan) > CHECKPOINT > boo-implementing-changes > boo-validating-changes (impl) > boo-reviewing-code |
 | Clear feature or change | boo-planning-changes > boo-validating-changes (plan) > CHECKPOINT > boo-implementing-changes > boo-validating-changes (impl) > boo-reviewing-code |
 | Bug, regression, "this is broken" | boo-investigating-failures > CHECKPOINT > boo-implementing-changes (planned fix) > boo-validating-changes (impl) > boo-reviewing-code |
-| Codebase cleanup, "make it good" | boo-auditing-code-quality > CHECKPOINT > boo-refactoring-code per backlog item > boo-reviewing-code |
+| Codebase cleanup, "make it good" | boo-auditing-code-quality > CHECKPOINT > per backlog item: boo-removing-dead-code for dead-code items, boo-refactoring-code for structural items > boo-reviewing-code |
 | New UI surface | boo-building-ui > boo-critiquing-frontend |
 | Architecture verdict | boo-mapping-project-context > boo-analyzing-architecture |
 | Unknown tech or library decision | prepend boo-researching to whichever pipeline follows |

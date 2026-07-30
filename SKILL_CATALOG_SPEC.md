@@ -235,6 +235,7 @@ Added after the v1 build; not part of the original 10-skill spec above.
 - **paseo-boo** - router/orchestrator. Dispatches catalog skills to Paseo subagents with role-based provider routing. Dispatch logic only; no domain knowledge.
 - **boo-building-ui** - builds new frontend UI to high-end design standards. Shares `references/design-guidance.md` with boo-critiquing-frontend via relative symlink. Neighbor boundary: critiquing-frontend critiques, building-ui builds.
 - **boo-refactoring-code** - executes behavior-preserving refactors in test-guarded steps. Neighbor boundary: auditing-code-quality finds candidates, refactoring-code executes them.
+- **boo-removing-dead-code** - deletes provably unreachable code in test-guarded batches, after a static, dynamic, and entry-point proof plus an adversarial-validator pass. Neighbor boundary: auditing-code-quality finds dead code, refactoring-code's move catalog contains no deletion, so removal is this skill's alone.
 
 Standing rules are now stamped from `STANDING_RULES.md` via `scripts/stamp-standing-rules.sh`; trigger evals live in `evals/`.
 - **boo-meta** (added 2026-06-12) - goal-to-pipeline router. Decomposes an operator goal into an ordered pipeline of catalog skills with checkpoints before code-writing stages and parallel fan-out for independent stages. Neighbor boundaries: paseo-boo dispatches one named skill; find-skills discovers external skills.

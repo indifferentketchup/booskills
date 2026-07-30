@@ -25,7 +25,7 @@ A current context map must exist. If one does not, run boo-mapping-project-conte
 ## Process
 
 1. Verify prerequisite: a context map exists (from boo-mapping-project-context). If not, stop and request it.
-2. If the `boocontext` MCP tools are available, gather hard structural evidence first and pass it to the analysts: `boocontext_callgraph` (callers/callees) and `boocontext_impact` (blast radius) seed `structural-analyst` and `behavioral-analyst`; `boocontext_health` (A-F grades, hotspots) and `boocontext_severity` (severity-classified hotspots with git churn) seed `risk-analyst`. This grounds the lenses in measured coupling instead of impressions. Skip when the tools are absent; the analysts still work from direct reads.
+2. If the `boocontext` MCP tools are available, gather hard structural evidence first and pass it to the analysts: `boocontext_callgraph` (callers/callees) and `boocontext_impact` (blast radius) seed `structural-analyst` and `behavioral-analyst`; `boocontext_health` (A-F grades, hotspots) and `boocontext_severity` (severity-classified hotspots with git churn) seed `risk-analyst`. On a JS/TS surface also run `node scripts/health-score.mjs <scope>` and seed `risk-analyst` with its hotspot ranking, which needs only `aislop` and git rather than an MCP server. This grounds the lenses in measured coupling and measured churn instead of impressions. Skip whichever tools are absent; the analysts still work from direct reads.
 3. Dispatch `structural-analyst`, `behavioral-analyst`, `concurrency-analyst`, and `risk-analyst` in parallel (each seeded with the boocontext evidence from step 2 when present).
 4. After all four report, dispatch `software-architect` to synthesize findings into recommendations.
 5. YAGNI gate every recommendation. Speculative abstractions, module splits justified by future flexibility, and refactoring paths without a measured forcing function go to Deferred.
@@ -40,7 +40,7 @@ A current context map must exist. If one does not, run boo-mapping-project-conte
 
 ## Gotchas
 
-- **Evidence rule**: every recommendation cites a specific finding (S#, B#, C#, R#). No finding, no recommendation.
+- **Evidence rule**: every recommendation cites a specific finding (S#, B#, C#, R#). No finding, no recommendation. A recommendation resting on change frequency may cite a `health-score.mjs` hotspot entry instead, since that is a measured number rather than an impression; everything else still needs a numbered finding.
 - **Context map is required**: without it, the analysis has no baseline. Stop and request one.
 <!-- standing-rules:pi:start -->
 - **Subagent visibility**: when the Paseo MCP tools (`mcp__paseo__*`) are available, spawn each agent persona as an attached Paseo subagent with `create_agent` (`detached: false`, `notifyOnFinish: true`; for an opencode provider also pass `settings.modeId: "build"` and `settings.features.auto_accept: true`) so every persona appears in the operator's Paseo agent track. Resolve each persona's provider/model from the active preset's `agents` map in `~/.paseo/orchestration-preferences.json` (Pi/OMP `provider/model` strings); supervise on the finish notification (never poll) and read each result with `get_agent_activity`.

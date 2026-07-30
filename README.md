@@ -4,7 +4,7 @@ This is my personal catalog of agent skills, plus the model router and Paseo pre
 
 ## What it does
 
-16 skills cover the work an agent actually gets asked to do: review a diff, investigate a failure, map an unfamiliar codebase, plan a change through OpenSpec, refactor in small steps, build or critique frontend UI, research a technical question. Each skill is one SKILL.md file (1489 lines total across all 16), written to a shared format so any agent that reads one knows what to expect from the rest.
+17 skills cover the work an agent actually gets asked to do: review a diff, investigate a failure, map an unfamiliar codebase, plan a change through OpenSpec, refactor in small steps, build or critique frontend UI, research a technical question. Each skill is one SKILL.md file (1626 lines total across all 17), written to a shared format so any agent that reads one knows what to expect from the rest.
 
 Next to the skills sit 12 agent personas, structural-analyst, risk-analyst, security-analyst, and so on, each rendered three times: a canonical Claude Code file, a Codex TOML, and an OpenCode markdown file. Same persona, same behavior, regardless of which tool dispatches it.
 
@@ -18,7 +18,7 @@ Full path from a goal to a running agent: `boo-meta` breaks the goal into a pipe
 git clone git@github.com:indifferentketchup/booskills.git ~/opt/booskills
 cd ~/opt/booskills
 bash scripts/install.sh          # skills, presets, registry, agents, router CLI
-bash scripts/stamp-standing-rules.sh  # sync standing rules into all 16 skills
+bash scripts/stamp-standing-rules.sh  # sync standing rules into all 17 skills
 paseo-preset workhorse             # switch active preset (+ sync OMP modelRoles)
 ```
 
@@ -37,7 +37,7 @@ On Windows: `pwsh scripts/install.ps1` (copy mode; re-run after every pull).
 
 ## Key numbers
 
-- 16 skills, 1489 SKILL.md lines total
+- 17 skills, 1626 SKILL.md lines total
 - 12 agent personas, 3 platform renderings each (36 files)
 - 12 Paseo orchestration presets, all array pools, no pinned model strings
 - Model router: 547 lines of scoring logic, 146 lines of load ledger, plus a Next.js control UI

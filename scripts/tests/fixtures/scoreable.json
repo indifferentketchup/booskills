@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1",
+  "cliVersion": "0.12.0",
+  "score": 80,
+  "label": "Healthy",
+  "scoreable": true,
+  "coverage": {
+    "supportedFiles": 17,
+    "unsupportedFiles": 0
+  },
+  "diagnostics": [
+    {
+      "filePath": "model-router/ui/app/api/registry/route.js",
+      "engine": "lint",
+      "rule": "unicorn/no-useless-fallback-in-spread",
+      "severity": "warning",
+      "fixable": false,
+      "scoreImpact": {
+        "tier": "maintainability",
+        "multiplier": 0.75,
+        "cap": 24,
+        "rationale": "Useless fallbacks add noise."
+      }
+    },
+    {
+      "filePath": "model-router/ui/app/Presets.jsx",
+      "engine": "lint",
+      "rule": "eslint/no-undef",
+      "severity": "error",
+      "fixable": false,
+      "scoreImpact": {
+        "tier": "strict",
+        "multiplier": 1,
+        "rationale": "Undefined identifiers are high-confidence runtime failures."
+      }
+    },
+    {
+      "filePath": "model-router/router.mjs",
+      "engine": "lint",
+      "rule": "unicorn/no-useless-fallback-in-spread",
+      "severity": "warning",
+      "fixable": false,
+      "scoreImpact": {
+        "tier": "maintainability",
+        "multiplier": 0.75,
+        "cap": 24,
+        "rationale": "Useless fallbacks add noise."
+      }
+    },
+    {
+      "filePath": "model-router/router.mjs",
+      "engine": "lint",
+      "rule": "unicorn/no-useless-fallback-in-spread",
+      "severity": "warning",
+      "fixable": false,
+      "scoreImpact": {
+        "tier": "maintainability",
+        "multiplier": 0.75,
+        "cap": 24,
+        "rationale": "Useless fallbacks add noise."
+      }
+    },
+    {
+      "filePath": "model-router/router.mjs",
+      "engine": "code-quality",
+      "rule": "complexity/file-too-large",
+      "severity": "warning",
+      "fixable": false,
+      "scoreImpact": {
+        "tier": "style",
+        "multiplier": 0.5,
+        "cap": 8,
+        "rationale": "Large files are reviewability pressure, but size alone is not a confirmed defect."
+      }
+    },
+    {
+      "filePath": "package.json",
+      "engine": "security",
+      "rule": "security/dependency-audit-skipped",
+      "severity": "info",
+      "fixable": false,
+      "scoreImpact": {
+        "tier": "advisory",
+        "multiplier": 0.25,
+        "cap": 8,
+        "rationale": "An unavailable audit is visibility loss, not evidence of a vulnerability."
+      }
+    }
+  ]
+}

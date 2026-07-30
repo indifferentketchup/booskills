@@ -18,6 +18,8 @@
     { "query": "boo reviewing-code on feature/auth", "expected": "paseo-boo" },
     { "query": "find a skill for kubernetes deploys", "expected": "find-skills" },
     { "query": "refactor the parser module", "expected": "boo-refactoring-code" },
+    { "query": "delete this dead code", "expected": "boo-removing-dead-code" },
+    { "query": "remove the unused exports from the utils module", "expected": "boo-removing-dead-code" },
     { "query": "why is this failing", "expected": "boo-investigating-failures" },
     { "query": "map out this codebase", "expected": "boo-mapping-project-context" }
   ]

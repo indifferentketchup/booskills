@@ -1,0 +1,9 @@
+{
+  "schemaVersion": "1",
+  "cliVersion": "0.12.0",
+  "score": null,
+  "label": "not scored",
+  "scoreable": false,
+  "coverage": { "supportedFiles": 0, "unsupportedFiles": 42, "dominantUnsupported": "md", "scoreable": false },
+  "diagnostics": []
+}

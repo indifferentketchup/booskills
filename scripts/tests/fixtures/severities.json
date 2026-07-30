@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1",
+  "cliVersion": "0.12.0",
+  "score": 61,
+  "label": "Needs work",
+  "scoreable": true,
+  "coverage": { "supportedFiles": 4, "unsupportedFiles": 0 },
+  "diagnostics": [
+    { "filePath": "a.js", "engine": "lint", "rule": "no-undef", "severity": "error", "fixable": false,
+      "scoreImpact": { "tier": "correctness", "multiplier": 1, "cap": 40 } },
+    { "filePath": "b.js", "engine": "format", "rule": "indent", "severity": "warning", "fixable": true,
+      "scoreImpact": { "tier": "maintainability", "multiplier": 0.75, "cap": 24 } },
+    { "filePath": "c.js", "engine": "lint", "rule": "no-shadow", "severity": "warning", "fixable": false,
+      "scoreImpact": { "tier": "maintainability", "multiplier": 0.75, "cap": 24 } },
+    { "filePath": "d.js", "engine": "security", "rule": "dependency-audit-skipped", "severity": "info", "fixable": false,
+      "scoreImpact": { "tier": "security", "multiplier": 0.5, "cap": 8 } }
+  ]
+}

@@ -22,11 +22,11 @@ Classify small/medium/large: small = one function or file (rename, extract, inli
 ## Process
 
 1. Pin the target: a named refactor goal (from the operator or an audit backlog item) with the files in scope. Restate it as "change structure X to Y; observable behavior unchanged." At medium+, if the `boocontext` MCP tools are available, run `boocontext_impact` (or `codesight_get_blast_radius`) on the in-scope files and fold every transitively affected file into the pinned scope before moving anything.
-2. Establish the safety net BEFORE touching code: run the tests covering the affected behavior and record the pass state. If the affected behavior has no tests, write characterization tests first (pin what the code does today, quirks included) and get them green.
+2. Establish the safety net BEFORE touching code: run the tests covering the affected behavior and record the pass state, and in the same step record the health baseline with `node scripts/health-score.mjs <scope>` so the refactor starts from a measurable number rather than an impression. Both happen before the first edit. If the affected behavior has no tests, write characterization tests first (pin what the code does today, quirks included) and get them green.
 3. If tests fail before any change: stop. A red suite is boo-investigating-failures territory, not a refactor starting point.
-4. Refactor in the smallest steps the language allows, naming each step by its catalog move (extract function, inline variable, move declaration, replace conditional with polymorphism). Run tests after every step; a red step is reverted, not debugged forward.
+4. Refactor in the smallest steps the language allows, naming each step by its catalog move (extract function, inline variable, move declaration, replace conditional with polymorphism). Run tests after every step; a red step is reverted, not debugged forward. Re-run `health-score.mjs` after each meaningful step and record the number, so the direction of travel is visible while there is still time to change course.
 5. One concern per batch: a rename batch never also restructures; a dedupe batch never also renames. Adjacent slop discovered mid-refactor goes to the report's Deferred list, not into this diff.
-6. Prove the result: full test run plus `git diff --stat`. A public API or exported signature changes only if the operator explicitly scoped it; otherwise revert that step.
+6. Prove the result: full test run, the health delta per in-scope file, and `git diff --stat`. A step that worsened a file's score is named in the report with the step that caused it; a green suite does not license omitting it. A public API or exported signature changes only if the operator explicitly scoped it; otherwise revert that step.
 7. Produce the report.
 
 ## What NOT to do
@@ -42,6 +42,8 @@ Classify small/medium/large: small = one function or file (rename, extract, inli
 - **Characterization tests pin bugs too**: when pinning untested behavior, assert what the code does, not what it should do. Fixing the bug is a separate dispatch.
 - **Suite cost**: if the full suite is slow, run the focused subset per step and the full suite once at the end; name which runs were focused.
 - **boocontext is optional**: the MCP tools are not on every machine or harness. Probe, use when present, fall back to grep-based dependency tracing when absent. A `boocontext_*` tool returning `UNSAFE` or empty means fall back, not stop.
+- **The health signal is optional, its absence is not silent**: `health-score.mjs` needs `aislop`, which is not installed everywhere, and a non-JS/TS or markdown-heavy scope comes back `scoreable: false`. Refactor anyway, and name the missing signal in "Claims I did not verify" rather than reporting a delta you did not measure.
+- **A cleaned file vanishes from the after-run**: only files with diagnostics appear. Absence means zero diagnostics, so report it as 100, never as a gap.
 <!-- standing-rules:core:start -->
 - **No commit**: never commit, push, or stage changes; never `git add -A`. Prove any edits with `git diff --stat`.
 - **No em dashes**: never use em dashes (U+2014) in output or files you write.
@@ -63,6 +65,14 @@ Classify small/medium/large: small = one function or file (rename, extract, inli
 | # | Catalog move | Files | Tests after |
 |---|--------------|-------|-------------|
 | 1 | extract function | src/foo.ts | pass (focused, 12 tests) |
+
+## Health delta
+
+| File | Score before | Score after | Delta |
+|------|--------------|-------------|-------|
+| src/foo.ts | 82 | 94 | +12 |
+
+A file absent from the after-run has no remaining diagnostics: report it as 100, not as missing data. Any negative delta is listed with the step that caused it.
 
 ## Diff summary
 <git diff --stat output>

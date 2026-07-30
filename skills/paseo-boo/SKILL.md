@@ -6,7 +6,8 @@ description: >
   booskills skill (boo-reviewing-code, boo-investigating-failures, boo-researching,
   boo-planning-changes, boo-implementing-changes, boo-auditing-code-quality,
   boo-analyzing-architecture, boo-mapping-project-context, boo-critiquing-frontend,
-  boo-building-ui, boo-refactoring-code, boo-validating-changes) run as
+  boo-building-ui, boo-refactoring-code, boo-removing-dead-code,
+  boo-validating-changes) run as
   a Paseo agent, says "boo <skill>" or "/paseo-boo", or asks for specialist
   work fanned out to Paseo-managed agents. Do NOT use to run a skill inline in
   the current session; invoke the skill directly instead. Do NOT use for
@@ -36,7 +37,7 @@ Pass-through. If the operator gives a size ($size or words like "large review"),
    - boo-reviewing-code, boo-auditing-code-quality, boo-investigating-failures, boo-analyzing-architecture, boo-validating-changes: `audit`
    - boo-researching, boo-mapping-project-context: `research`
    - boo-planning-changes: `planning`
-   - boo-implementing-changes, boo-refactoring-code: `impl`
+   - boo-implementing-changes, boo-refactoring-code, boo-removing-dead-code: `impl`
    - boo-critiquing-frontend, boo-building-ui: `ui`
 4. Resolve the target working directory: the repo the work concerns, not this session's cwd, unless they are the same. Ask only if genuinely ambiguous.
 5. Compose the dispatch prompt. It must be self-contained for a fresh context:

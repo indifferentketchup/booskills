@@ -21,9 +21,9 @@ Classify small/medium/large from tree scope (single module vs whole repo). Defau
 ## Process
 
 1. Size by tree scope.
-2. Run mechanical detectors first (scripts/ per stack: lint, dead-code tools, duplication tools). If the `boocontext` MCP tools are available, run `boocontext_health` (A-F grades, hotspot files, top refactoring targets) and `boocontext_severity` (severity-classified hotspots with git churn  --  INFO/MINOR/MAJOR/CRITICAL across MAINTAINABILITY/RELIABILITY/SECURITY domains) to seed the agent pass. Collect raw output in references/.
-3. Agent pass on mechanical hits and sampled hot files: dispatch `structural-analyst` for refactor candidates, dispatch `behavioral-analyst` for logic quality on high-complexity files.
-4. Score each finding: impact (high/med/low) x effort (S/M/L).
+2. Run mechanical detectors first, before any agent dispatch. On a JS/TS surface run `aislop scan --json <scope>` and `node scripts/health-score.mjs <scope>`, which rolls aislop's diagnostics into a per-file score and joins them with git churn to rank hotspots. Add stack-specific tools from scripts/ (lint, dead-code, duplication). If the `boocontext` MCP tools are available, run `boocontext_health` (A-F grades, hotspot files, top refactoring targets) and `boocontext_severity` (severity-classified hotspots with git churn  --  INFO/MINOR/MAJOR/CRITICAL across MAINTAINABILITY/RELIABILITY/SECURITY domains) as well. Collect raw output in references/.
+3. Agent pass on mechanical hits and sampled hot files, seeded with the hotspot ranking from step 2 so the lenses start where the measured deficit and churn are highest: dispatch `structural-analyst` for refactor candidates, dispatch `behavioral-analyst` for logic quality on high-complexity files.
+4. Score each finding: impact (high/med/low) x effort (S/M/L). Order the backlog by the hotspot rank from step 2, not by impression; impact x effort breaks ties within a rank.
 5. YAGNI gate optimizations: any optimization without a measured pain point (perf number, incident, recurring friction) goes to Deferred with the metric that would reopen it.
 6. Produce the prioritized backlog.
 
@@ -49,6 +49,9 @@ AI slop categories to detect (concrete grep/heuristic per category):
 ## Gotchas
 
 - **Evidence rule**: mechanical tool output is codebase-level evidence. Performance claims need measured numbers.
+- **aislop severities are blocking, not advisory**: a diagnostic at `severity: error`, or at `severity: warning` with `fixable: true`, is a blocking finding. `health-score.mjs` precomputes this per file as `blocking: true`; do not re-derive the rule.
+- **The measured signal is optional, its absence is not silent**: `aislop` is not installed everywhere and `health-score.mjs` needs it. When it is missing, or when the scope comes back `scoreable: false` (a markdown-heavy directory returns `supportedFiles: 0`), audit on agent judgment and name the missing signal in "Claims I did not verify". Never present an invented score.
+- **`aislop scan` exits 1 whenever the tree holds an error-severity finding**, while still printing complete JSON. Read the score from stdout; a non-zero exit is not a failure.
 - **boocontext is optional**: the MCP tools are not on every machine or harness. Probe, use when present, fall back to scripts and direct reads when absent. A `boocontext_*` tool returning `UNSAFE` or empty means fall back, not stop. These tools grade code files only; markdown-heavy scopes return no_data. `boocontext_severity` enriches health hotspots with git churn for triage priority (commits + recency = severity).
 <!-- standing-rules:pi:start -->
 - **Subagent visibility**: when the Paseo MCP tools (`mcp__paseo__*`) are available, spawn each agent persona as an attached Paseo subagent with `create_agent` (`detached: false`, `notifyOnFinish: true`; for an opencode provider also pass `settings.modeId: "build"` and `settings.features.auto_accept: true`) so every persona appears in the operator's Paseo agent track. Resolve each persona's provider/model from the active preset's `agents` map in `~/.paseo/orchestration-preferences.json` (Pi/OMP `provider/model` strings); supervise on the finish notification (never poll) and read each result with `get_agent_activity`.
@@ -70,9 +73,11 @@ AI slop categories to detect (concrete grep/heuristic per category):
 
 ## Backlog
 
-| # | Category | File:line | Impact | Effort | Finding | Remediation |
-|---|----------|-----------|--------|--------|---------|-------------|
-| 1 | Dead code | src/foo.ts:42 | High | S | ... | ... |
+| # | Category | File:line | Hotspot | Score | Impact | Effort | Finding | Remediation |
+|---|----------|-----------|---------|-------|--------|--------|---------|-------------|
+| 1 | Dead code | src/foo.ts:42 | 21 | 82 | High | S | ... | ... |
+
+Hotspot and Score come from `health-score.mjs`. Rows sort by Hotspot descending. Blocking findings are marked in the Finding column.
 
 ## Mechanical Tool Output
 <in references/ subdirectory>

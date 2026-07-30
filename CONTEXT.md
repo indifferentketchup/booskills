@@ -4,7 +4,7 @@
 
 ```
 booskills/
-├── skills/                    # 16 skill SKILL.md files (the catalog)
+├── skills/                    # 17 skill SKILL.md files (the catalog)
 │   ├── boo-analyzing-architecture/
 │   ├── boo-auditing-code-quality/
 │   ├── boo-building-ui/       # references/design-guidance.md symlinks to critiquing-frontend's
@@ -16,6 +16,7 @@ booskills/
 │   ├── boo-planning-changes/
 │   ├── boo-refactoring-code/
 │   ├── boo-refining-ideas/
+│   ├── boo-removing-dead-code/ # test-guarded deletion of provably unreachable code
 │   ├── boo-researching/
 │   ├── boo-reviewing-code/
 │   ├── boo-router/            # wraps model-router/router.mjs; picks one provider per dispatch (L/C/B/A/S presets)
@@ -45,7 +46,9 @@ booskills/
 ├── scripts/
 │   ├── install.sh             # Symlink/copy installer for skills + agents
 │   ├── apply-agent-models.sh  # Applies model assignments to agent renderings
-│   └── stamp-standing-rules.sh # Syncs STANDING_RULES.md blocks into every skill's Gotchas
+│   ├── stamp-standing-rules.sh # Syncs STANDING_RULES.md blocks into every skill's Gotchas
+│   ├── health-score.mjs       # Per-file health score: aislop diagnostics rolled up, joined with git churn
+│   └── tests/                 # node --test suite for health-score.mjs, with frozen aislop fixtures
 ├── evals/                     # Trigger evals: <skill>.json labeled queries + README protocol
 ├── model-router/              # Deterministic model selector (router.mjs + README); wrapped by skills/boo-router
 ├── docs/adr/                  # Architecture decision records (0001 = deterministic router)

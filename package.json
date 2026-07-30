@@ -11,7 +11,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test model-router/tests/*.test.mjs"
+    "test": "node --test model-router/tests/*.test.mjs scripts/tests/*.test.mjs"
   },
   "files": [
     "skills",
@@ -27,6 +27,7 @@
     "scripts/seed-presets.sh",
     "scripts/generate-presets.py",
     "scripts/generate-model-tiers.py",
+    "scripts/health-score.mjs",
     "scripts/stamp-standing-rules.sh",
     "scripts/apply-agent-models.sh",
     "scripts/paseo-preset",
