@@ -71,7 +71,7 @@ Control panel at `http://localhost:3000`, with tabs for Playground, Load dashboa
 | `subscription-low` | B | GPT-5.1-Codex-Mini + Haiku |
 | `subscription-mid` | A | GPT-5.4 + Sonnet |
 
-Every preset is an array pool, never a single pinned model, so the router picks from the pool per dispatch based on the task in front of it instead of a fixed assignment. Provider strings follow Pi/OMP format: the default Grade C providers use `omp/deepseek/`, `omp/xiaomi/`, and `omp/minimax-code/`; other cloud gateway models use the `litellm/` proxy; local models use llama-swap.
+Every preset is an array pool, never a single pinned model, so the router picks from the pool per dispatch based on the task in front of it instead of a fixed assignment. Provider strings follow Pi/OMP format: the default Grade C providers use `pi/deepseek/`, `pi/xiaomi/`, and `pi/minimax/`; other cloud gateway models use the `litellm/` proxy; local models use llama-swap.
 
 After editing `scripts/generate-presets.py`, regenerate and reinstall:
 

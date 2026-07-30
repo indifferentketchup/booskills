@@ -14,9 +14,9 @@ OUT_HOME = Path(os.environ.get("PASEO_MODEL_TIERS", Path.home() / ".paseo" / "mo
 OUT_REPO = REPO / "model-registry" / "model-tiers.json"
 
 GATEWAY: dict[str, str] = {
-    "mimo-v2.5": "omp/xiaomi/mimo-v2.5",
-    "mimo-v2.5-pro": "omp/xiaomi/mimo-v2.5-pro",
-    "minimax-m3": "omp/minimax-code/MiniMax-M3",
+    "mimo-v2.5": "pi/xiaomi/mimo-v2.5",
+    "mimo-v2.5-pro": "pi/xiaomi/mimo-v2.5-pro",
+    "minimax-m3": "pi/minimax/MiniMax-M3",
     "minimax-m2.7": "litellm/minimax-m2.7",
     "minimax-m2.5": "litellm/openrouter/minimax/minimax-m2.5",
     "qwen3.7-plus": "litellm/openrouter/qwen/qwen3.7-plus",
@@ -159,9 +159,9 @@ def remap_tier_provider(entry: str) -> str:
         return GATEWAY.get(slug, f"litellm/openrouter/{slug}")
     if s.startswith("reasonix/"):
         if "deepseek-v4-flash" in s:
-            return "omp/deepseek/deepseek-v4-flash"
+            return "pi/deepseek/deepseek-v4-flash"
         if "deepseek-v4-pro" in s:
-            return "omp/deepseek/deepseek-v4-pro"
+            return "pi/deepseek/deepseek-v4-pro"
     if s.startswith("deepseek/"):
         return f"litellm/{s}"
     if s.startswith("openrouter/"):
