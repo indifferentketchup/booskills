@@ -203,15 +203,18 @@ function fitScore(attrs, request) {
 
 // Classify a provider string into a cost/priority source for provider_priority.
 // Order matters: check the cloud gateways before the generic opencode markers.
-// The omp/ wrapper prefix (routes any litellm/ model through the OMP agent
-// provider) is stripped first so classification runs on the underlying route.
+// The pi/ or omp/ wrapper prefix (routes any litellm/ model through the Pi or
+// legacy OMP agent provider) is stripped first so classification runs on the
+// underlying route.
 function sourceOf(provider) {
   let s = String(provider);
   if (s.startsWith("omp/")) s = s.slice(4);
+  else if (s.startsWith("pi/")) s = s.slice(3);
   if (s.startsWith("litellm/")) return "litellm";
   if (s.startsWith("deepseek/")) return "deepseek";
   if (s.startsWith("xiaomi/")) return "xiaomi";
   if (s.startsWith("minimax-code/")) return "minimax-code";
+  if (s.startsWith("minimax/")) return "minimax-code";
   if (s.includes("digitalocean")) return "digitalocean";
   if (s.startsWith("kilo/")) return "kilo";
   if (s.startsWith("openrouter/") || s.includes("openrouter")) return "openrouter";
@@ -434,7 +437,6 @@ function chooseProvider(request, preset, registry) {
 // Clamps to the model's supported levels and steps effort down under context
 // pressure (reasoning consumes output headroom that a near-full window lacks).
 function resolveReasoning(provider, registry, difficulty, contextTokens = 0, priorityName = "balanced") {
-  const key = modelKey(provider);
   const regKey = registryLookupKey(provider, registry);
   const r = registry.reasoning?.[regKey];
   if (!r) return { effort: "auto", apply: "no reasoning profile in registry; leave model default" };
@@ -473,7 +475,7 @@ function resolveReasoning(provider, registry, difficulty, contextTokens = 0, pri
 // bypass/yolo (registry permissions._default); settings go to create_agent.
 function resolvePermissions(provider, registry) {
   const parts = String(provider).split("/");
-  let backend = parts[0] === "omp" ? parts[1] : parts[0];
+  let backend = parts[0] === "omp" || parts[0] === "pi" ? parts[1] : parts[0];
   if (backend.startsWith("oc-")) backend = "opencode";
   const backendAliases = {
     anthropic: "claude",
@@ -485,7 +487,7 @@ function resolvePermissions(provider, registry) {
   const mode = registry.permissions?._default || "bypass";
   const p = registry.permissions?.[permBackend];
   if (!p) {
-    const piBackends = new Set(["litellm", "deepseek", "xiaomi", "minimax-code", "kilo", "openrouter", "cursor", "google-antigravity", "llama-swap"]);
+    const piBackends = new Set(["litellm", "deepseek", "xiaomi", "minimax-code", "minimax", "kilo", "openrouter", "cursor", "google-antigravity", "llama-swap"]);
     const note = piBackends.has(backend)
       ? "Pi/OMP session: pass provider/model only; no create_agent permission profile"
       : "no permission profile for this backend; pass nothing";

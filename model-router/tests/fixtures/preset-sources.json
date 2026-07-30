@@ -16,7 +16,9 @@
     "opencode-go -> opencode-go/legacy-model",
     "subscription -> cursor/composer-2.5",
     "gateway-free -> gateway/nemotron-3-ultra:free",
-    "other -> mystery/mystery-model (provider_priority.other is 0/falsy in the real registry; no reason is ever emitted for this branch, by design, not a bug)"
+    "other -> mystery/mystery-model (provider_priority.other is 0/falsy in the real registry; no reason is ever emitted for this branch, by design, not a bug)",
+    "pi-xiaomi -> pi/xiaomi/mimo-v2.5-pro (native pi/ direct, wrapped, same source bucket as bare xiaomi)",
+    "pi-minimax -> pi/minimax/MiniMax-M3 (native pi/ direct, wrapped; unwraps to the minimax-code source bucket, pi's minimax subprovider slug differs from omp's minimax-code slug)"
   ],
   "providers": {
     "impl": [
@@ -33,7 +35,9 @@
       "opencode-go/legacy-model",
       "cursor/composer-2.5",
       "gateway/nemotron-3-ultra:free",
-      "mystery/mystery-model"
+      "mystery/mystery-model",
+      "pi/xiaomi/mimo-v2.5-pro",
+      "pi/minimax/MiniMax-M3"
     ],
     "ui": [
       "litellm/openrouter/z-ai/glm-5",
@@ -49,7 +53,9 @@
       "opencode-go/legacy-model",
       "cursor/composer-2.5",
       "gateway/nemotron-3-ultra:free",
-      "mystery/mystery-model"
+      "mystery/mystery-model",
+      "pi/xiaomi/mimo-v2.5-pro",
+      "pi/minimax/MiniMax-M3"
     ],
     "audit": [
       "litellm/openrouter/z-ai/glm-5",
@@ -65,7 +71,9 @@
       "opencode-go/legacy-model",
       "cursor/composer-2.5",
       "gateway/nemotron-3-ultra:free",
-      "mystery/mystery-model"
+      "mystery/mystery-model",
+      "pi/xiaomi/mimo-v2.5-pro",
+      "pi/minimax/MiniMax-M3"
     ],
     "research": [
       "litellm/openrouter/z-ai/glm-5",
@@ -81,7 +89,9 @@
       "opencode-go/legacy-model",
       "cursor/composer-2.5",
       "gateway/nemotron-3-ultra:free",
-      "mystery/mystery-model"
+      "mystery/mystery-model",
+      "pi/xiaomi/mimo-v2.5-pro",
+      "pi/minimax/MiniMax-M3"
     ],
     "planning": [
       "litellm/openrouter/z-ai/glm-5",
@@ -97,7 +107,9 @@
       "opencode-go/legacy-model",
       "cursor/composer-2.5",
       "gateway/nemotron-3-ultra:free",
-      "mystery/mystery-model"
+      "mystery/mystery-model",
+      "pi/xiaomi/mimo-v2.5-pro",
+      "pi/minimax/MiniMax-M3"
     ]
   }
 }

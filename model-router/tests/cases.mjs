@@ -88,7 +88,7 @@ const localityCases = [
 const sourceBranches = [
   "litellm", "deepseek", "xiaomi", "minimax-code", "digitalocean", "kilo",
   "openrouter", "reasonix", "local", "local-edge", "opencode-go",
-  "subscription", "gateway-free", "other",
+  "subscription", "gateway-free", "other", "pi-xiaomi", "pi-minimax",
 ];
 const sourcesCases = sourceBranches.map((branch) => ({
   id: `sources-${branch}`,

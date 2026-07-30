@@ -31,9 +31,9 @@ def litellm(route: str) -> str:
     return f"litellm/{route}"
 
 
-def omp(provider: str, model: str) -> str:
-    """Route through Pi's native OMP provider integration."""
-    return f"omp/{provider}/{model}"
+def pi(provider: str, model: str) -> str:
+    """Route through Paseo's native Pi provider integration."""
+    return f"pi/{provider}/{model}"
 
 
 def anthropic(model: str) -> str:
@@ -68,7 +68,7 @@ def pool(*entries: str | list[str]) -> list[str]:
 
 # Cloud gateway models route through litellm/ (single LiteLLM proxy pool).
 M: dict[str, str | list[str]] = {
-    "mimo-v2.5-pro": omp("xiaomi", "mimo-v2.5-pro"),
+    "mimo-v2.5-pro": pi("xiaomi", "mimo-v2.5-pro"),
     "glm-5.1": litellm("openrouter/z-ai/glm-5.2"),
     "qwen3.7-max": litellm("openrouter/qwen/qwen3.7-max"),
     "gpt-5.5": openai_codex("gpt-5.5"),
@@ -76,21 +76,21 @@ M: dict[str, str | list[str]] = {
     "fable": anthropic("claude-fable-5"),
     "composer-2.5": cursor("composer-2.5"),
     "gemini-3.1-pro": gemini("gemini-3.1-pro"),
-    "deepseek-v4-pro": omp("deepseek", "deepseek-v4-pro"),
+    "deepseek-v4-pro": pi("deepseek", "deepseek-v4-pro"),
     "qwen3.7-plus": litellm("openrouter/qwen/qwen3.7-plus"),
     "kimi-k2.6": litellm("moonshot/kimi-k2.6"),
     "glm-5": litellm("openrouter/z-ai/glm-5"),
     "sonnet": anthropic("claude-sonnet-4-6"),
     "gpt-5.4": openai_codex("gpt-5.4"),
     "composer-1.5": cursor("composer-1.5"),
-    "minimax-m3": omp("minimax-code", "MiniMax-M3"),
+    "minimax-m3": pi("minimax", "MiniMax-M3"),
     "haiku": anthropic("claude-haiku-4-5"),
     "gpt-5.1-mini": openai_codex("gpt-5.1-codex-mini"),
     "laguna-m.1": litellm("laguna-m.1"),
     "owl-alpha": litellm("openrouter/owl-alpha"),
     "step-3.7-flash": litellm("openrouter/stepfun/step-3.7-flash"),
-    "mimo-v2.5": omp("xiaomi", "mimo-v2.5"),
-    "deepseek-v4-flash": omp("deepseek", "deepseek-v4-flash"),
+    "mimo-v2.5": pi("xiaomi", "mimo-v2.5"),
+    "deepseek-v4-flash": pi("deepseek", "deepseek-v4-flash"),
     "qwen3.6-35b-a3b": local("qwen3.6-35b-a3b"),
     "qwen3.6-27b": local("qwen3.6-27b"),
     "nemotron-cascade-30b": local("nemotron-cascade-2-30b-a3b"),
@@ -166,21 +166,21 @@ LOCAL_PREFERENCES = BASE_PREFERENCES + [
 
 CLOUD_PREFERENCES = BASE_PREFERENCES + [
     "Default cloud posture: Pi-native MiniMax M3, MiMo 2.5/2.5 Pro, and DeepSeek V4 Flash/Pro are the Grade C workhorse pool; use grade-A/S for explicit quality needs.",
-    "Provider strings use Pi/OMP format. Pi-native DeepSeek, Xiaomi, and MiniMax routes use omp/<provider>/<model>; other cloud gateway models route via litellm/.",
+    "Provider strings use Pi/OMP format. Pi-native DeepSeek, Xiaomi, and MiniMax routes use pi/<provider>/<model>; other cloud gateway models route via litellm/ (still proxied through the legacy OMP provider until Pi exposes the same gateway).",
 ]
 
 DEFAULT_AGENTS_CLOUD = {
-    "adversarial-security-analyst": omp("deepseek", "deepseek-v4-flash"),
-    "adversarial-validator": omp("xiaomi", "mimo-v2.5"),
-    "behavioral-analyst": omp("xiaomi", "mimo-v2.5"),
-    "concurrency-analyst": omp("deepseek", "deepseek-v4-flash"),
-    "edge-case-explorer": omp("xiaomi", "mimo-v2.5"),
-    "evidence-based-investigator": omp("xiaomi", "mimo-v2.5"),
-    "junior-developer": omp("deepseek", "deepseek-v4-flash"),
-    "risk-analyst": omp("deepseek", "deepseek-v4-flash"),
+    "adversarial-security-analyst": pi("deepseek", "deepseek-v4-flash"),
+    "adversarial-validator": pi("xiaomi", "mimo-v2.5"),
+    "behavioral-analyst": pi("xiaomi", "mimo-v2.5"),
+    "concurrency-analyst": pi("deepseek", "deepseek-v4-flash"),
+    "edge-case-explorer": pi("xiaomi", "mimo-v2.5"),
+    "evidence-based-investigator": pi("xiaomi", "mimo-v2.5"),
+    "junior-developer": pi("deepseek", "deepseek-v4-flash"),
+    "risk-analyst": pi("deepseek", "deepseek-v4-flash"),
     "software-architect": litellm("openrouter/z-ai/glm-5"),
-    "structural-analyst": omp("xiaomi", "mimo-v2.5"),
-    "test-engineer": omp("deepseek", "deepseek-v4-flash"),
+    "structural-analyst": pi("xiaomi", "mimo-v2.5"),
+    "test-engineer": pi("deepseek", "deepseek-v4-flash"),
     "user-experience-designer": cursor("composer-2.5"),
 }
 
